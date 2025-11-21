@@ -11,29 +11,59 @@ const observer = new IntersectionObserver((entries) => {
 
 lazyElements.forEach(el => observer.observe(el));
 
-// Dark/Light mode toggle
+// Dark/Light mode toggle (guard in case element missing)
 const modeToggle = document.getElementById('modeToggle');
-modeToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-  document.body.classList.toggle('light-mode');
-  modeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
-});
+if (modeToggle) {
+  modeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    document.body.classList.toggle('light-mode');
+    modeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+  });
+}
 
-// Example CTA buttons
-document.getElementById('getStartedBtn').addEventListener('click', () => {
-  alert("Sign Up flow goes here!");
-});
+// Navigation: wire CTAs to actual pages (safe checks)
+const getStartedBtn = document.getElementById('getStartedBtn');
+if (getStartedBtn) {
+  getStartedBtn.addEventListener('click', () => {
+    window.location.href = 'signup.html';
+  });
+}
 
-document.getElementById('seeDemoBtn').addEventListener('click', () => {
-  alert("Demo of RiseFaze core loop!");
-});
+const startJourneyBtn = document.getElementById('startJourneyBtn');
+if (startJourneyBtn) {
+  startJourneyBtn.addEventListener('click', () => {
+    window.location.href = 'signup.html';
+  });
+}
 
-document.getElementById('startJourneyBtn').addEventListener('click', () => {
-  alert("Core loop prototype opens!");
-});
+const signupBtn = document.getElementById('signupBtn');
+if (signupBtn) {
+  signupBtn.addEventListener('click', () => {
+    window.location.href = 'signup.html';
+  });
+}
 
-// Floating Feedback Button
+const loginBtn = document.getElementById('loginBtn');
+if (loginBtn) {
+  loginBtn.addEventListener('click', () => {
+    window.location.href = 'login.html';
+  });
+}
+
+// Optional/demo button (keep behavior if present)
+const seeDemoBtn = document.getElementById('seeDemoBtn');
+if (seeDemoBtn) {
+  seeDemoBtn.addEventListener('click', () => {
+    // navigate to demo page if you add one, otherwise keep placeholder
+    alert("Demo of RiseFaze core loop!");
+  });
+}
+
+// Floating Feedback Button (guard)
 const feedbackBtn = document.getElementById('feedbackBtn');
-feedbackBtn.addEventListener('click', () => {
-  alert("Feedback form opens here! Share your thoughts about RiseFaze.");
-});
+if (feedbackBtn) {
+  feedbackBtn.addEventListener('click', () => {
+    // alert("Feedback form opens here! Share your thoughts about RiseFaze.");
+    window.location.href = 'feedback.html';
+  });
+}

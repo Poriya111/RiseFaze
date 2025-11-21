@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RiseFaze — Login</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-mode">
+
+<!-- Header -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <img src="media/logo.png" alt="RiseFaze logo" class="logo-img">
+    RiseFaze
+  </a>
+  <nav>
+    <a href="index.html#features" class="nav-link">Features</a>
+    <a href="index.html#explore" class="nav-link">Explore</a>
+    <a href="#about" class="nav-link">Learn More</a>
+    <button class="btn mode-toggle" id="modeToggle">🌙</button>
+    <a href="login.html" class="btn login-btn">Login</a>
+    <a href="signup.html" class="btn primary-btn">Sign Up</a>
+  </nav>
+</header>
+
+<!-- Auth Section -->
+<section class="auth-section lazy-load">
+  <h2>Welcome back</h2>
+  <p>Sign in to continue building your digital empire — manage assets, track growth and compete globally.</p>
+
+  <div class="auth-container" style="justify-content: center;">
+    <!-- Form Card -->
+    <div class="feature-card auth-form-card" style="max-width: 420px;">
+      <form id="loginForm" autocomplete="on" novalidate>
+        <div class="auth-form-group">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required placeholder="you@example.com" />
+        </div>
+
+        <div class="auth-form-group">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required placeholder="Enter your Password.." />
+        </div>
+
+        <button type="submit" class="btn primary-btn auth-submit-btn">Sign in</button>
+
+        <div class="auth-footer-text">
+          Don't have an account? <a href="signup.html">Create one</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <p>&copy; 2025 RiseFaze. All rights reserved. <strong>Version 1.0</strong></p>
+  </div>
+</footer>
+
+<!-- Feedback button -->
+<button class="feedback-btn" id="feedbackBtn" title="Send Feedback"></button>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const email = this.email.value.trim();
+    const pw = this.password.value;
+    if (!email || !pw) {
+      alert('Please fill all required fields.');
+      return;
+    }
+    alert('Signing in — replace with real auth flow.');
+  });
+
+  const _hid = document.createElement('div');
+  _hid.style.display = 'none';
+  _hid.innerHTML = '<button id="getStartedBtn"></button><button id="seeDemoBtn"></button><button id="startJourneyBtn"></button>';
+  document.body.appendChild(_hid);
+</script>
+
+<script src="main.js"></script>
+</body>
+</html>

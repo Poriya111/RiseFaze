@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RiseFaze — Sign Up</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-mode">
+
+<!-- Header -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <img src="media/logo.png" alt="RiseFaze logo" class="logo-img">
+    RiseFaze
+  </a>
+  <nav>
+    <a href="index.html#features" class="nav-link">Features</a>
+    <a href="index.html#explore" class="nav-link">Explore</a>
+    <a href="index.html#about" class="nav-link">Learn More</a>
+    <button class="btn mode-toggle" id="modeToggle">🌙</button>
+    <a href="login.html" class="btn login-btn">Login</a>
+    <a href="signup.html" class="btn primary-btn">Sign Up</a>
+  </nav>
+</header>
+
+<!-- Signup Section -->
+<section class="signup-hero lazy-load">
+  <div class="auth-section">
+    <h2>Create your RiseFaze account</h2>
+    <p>Start your simulated empire — claim your starter assets and begin earning RFC.</p>
+
+    <div class="auth-container">
+      <!-- Form Card -->
+      <div class="feature-card auth-form-card">
+        <form id="signupForm" novalidate>
+          <div class="auth-form-group">
+            <label for="fullname">Full name</label>
+            <input id="fullname" name="fullname" type="text" required placeholder="FirstName & LastName" />
+          </div>
+
+          <div class="auth-form-group">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" required placeholder="you@example.com" />
+          </div>
+
+          <div class="auth-form-row">
+            <div class="auth-form-group">
+              <label for="password">Password</label>
+              <input id="password" name="password" type="password" required placeholder="Create a password" />
+            </div>
+            <div class="auth-form-group">
+              <label for="confirm">Confirm</label>
+              <input id="confirm" name="confirm" type="password" required placeholder="Repeat password" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn primary-btn auth-submit-btn">Create account</button>
+
+          <div class="auth-footer-text">
+            Already have an account? <a href="login.html">Login</a>
+          </div>
+        </form>
+      </div>
+
+      <!-- Info Card -->
+      <div class="feature-card auth-info-card">
+        <h3>Why join RiseFaze?</h3>
+        <div class="auth-info-points">
+          <div class="auth-info-point">
+            <div class="auth-info-icon">💰</div>
+            <p>Get starter assets and RFC tokens to practice business strategy.</p>
+          </div>
+          <div class="auth-info-point">
+            <div class="auth-info-icon">📊</div>
+            <p>Track net worth and climb global leaderboards.</p>
+          </div>
+          <div class="auth-info-point">
+            <div class="auth-info-icon">🛡️</div>
+            <p>Safe sandbox — no real money required.</p>
+          </div>
+        </div>
+        <!-- <hr /> -->
+        <!-- <div>By creating an account you agree to our Terms. This is a prototype UI — authentication hooks need backend.</div> -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="about" class="lazy-load">
+  <h2>What is RiseFaze?</h2>
+  <p>RiseFaze is a cutting-edge platform designed to empower you in building and managing your digital empire. It provides the tools you need to track growth, manage digital assets, and compete on a global scale. My mission is to turn your vision into a thriving reality.</p>
+  <div class="about-container" style="margin-top: 20px;">
+    <div class="about-image">
+      <img src="media/logo.png" alt="RiseFaze illustration">
+    </div>
+    <div class="about-points">
+      <div class="about-point">
+        <div class="about-icon">🌐</div>
+        <h3>Global Competition</h3>
+        <p>Engage with a global community and see how your empire stacks up against others worldwide.</p>
+      </div>
+      <div class="about-point">
+        <div class="about-icon">📈</div>
+        <h3>Track Your Growth</h3>
+        <p>Utilize advanced analytics to monitor your progress and make data-driven decisions for expansion.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <p>&copy; 2025 RiseFaze. All rights reserved. <strong>Version 1.0</strong></p>
+    <div class="footer-links">
+      <a href="#">Terms</a>
+      <a href="#">Privacy</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Feedback & hidden elements for main.js -->
+<button class="feedback-btn" id="feedbackBtn" title="Send Feedback"></button>
+
+<script>
+  document.getElementById('signupForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const name = this.fullname.value.trim();
+    const email = this.email.value.trim();
+    const pw = this.password.value;
+    const confirm = this.confirm.value;
+    if (!name || !email || !pw || !confirm) {
+      alert('Please complete all required fields.');
+      return;
+    }
+    if (pw !== confirm) {
+      alert('Passwords do not match.');
+      return;
+    }
+    alert('Account created — replace with backend integration.');
+  });
+
+  const _hid = document.createElement('div');
+  _hid.style.display = 'none';
+  _hid.innerHTML = '<button id="getStartedBtn"></button><button id="seeDemoBtn"></button><button id="startJourneyBtn"></button>';
+  document.body.appendChild(_hid);
+</script>
+
+<script src="main.js"></script>
+</body>
+</html>

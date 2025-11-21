@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RiseFaze — Feedback</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-mode">
+
+<!-- Header -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <img src="media/logo.png" alt="RiseFaze logo" class="logo-img">
+    RiseFaze
+  </a>
+  <nav>
+    <!-- <a href="index.html#features" class="nav-link">Features</a>
+    <a href="index.html#explore" class="nav-link">Explore</a> -->
+    <!-- <button class="btn mode-toggle" id="modeToggle">🌙</button> -->
+    <a href="login.html" class="btn login-btn">Login</a>
+    <a href="signup.html" class="btn primary-btn">Sign Up</a>
+  </nav>
+</header>
+
+<!-- Feedback Section -->
+<section class="auth-section lazy-load">
+  <h2>Give your Feedback!</h2>
+  <p>Help improve RiseFaze by sharing your thoughts. Choose the appropriate form below:</p>
+
+  <div class="auth-container" style="justify-content: center;">
+    <!-- User Feedback Card -->
+    <div class="feature-card auth-form-card" style="max-width: 420px;">
+      <h3>General User Feedback</h3>
+      <p>For all RiseFaze users. Share your experience, suggestions, and report any issues.</p>
+      <a href="#" class="btn primary-btn auth-submit-btn" style="text-decoration: none;">
+        Fill User Feedback Form
+      </a>
+    </div>
+
+    <!-- Developer Feedback Card -->
+    <div class="feature-card auth-form-card" style="max-width: 420px;">
+      <h3>Developer Feedback</h3>
+      <p>For developers and technical users. Provide detailed feedback on technical aspects, APIs, etc.</p>
+      <a href="#" class="btn primary-btn auth-submit-btn" style="text-decoration: none;">
+        Fill Developer Feedback Form
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <p>&copy; 2025 RiseFaze. All rights reserved. <strong>Version 1.0</strong></p>
+  </div>
+</footer>
+
+<script>
+ // Lazy loading for sections
+ const lazyElements = document.querySelectorAll('.lazy-load');
+ const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+   if(entry.isIntersecting){
+    entry.target.classList.add('visible');
+    observer.unobserve(entry.target);
+   }
+  });
+ }, { threshold: 0.2 });
+
+ lazyElements.forEach(el => observer.observe(el));
+</script>
+<script src="main.js"></script>
+</body>
+</html>
