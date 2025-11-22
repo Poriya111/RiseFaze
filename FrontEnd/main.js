@@ -50,6 +50,13 @@ if (loginBtn) {
   });
 }
 
+const guestBtn = document.getElementById('guestBtn');
+if (guestBtn) {
+  guestBtn.addEventListener('click', () => {
+    window.location.href = 'index.html';
+  });
+}
+
 // Optional/demo button (keep behavior if present)
 const seeDemoBtn = document.getElementById('seeDemoBtn');
 if (seeDemoBtn) {

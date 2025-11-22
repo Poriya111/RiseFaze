@@ -30,7 +30,7 @@
   <h2>Welcome back</h2>
   <p>Sign in to continue building your digital empire — manage assets, track growth and compete globally.</p>
 
-  <div class="auth-container" style="justify-content: center;">
+  <div class="auth-container">
     <!-- Form Card -->
     <div class="feature-card auth-form-card" style="max-width: 420px;">
       <form id="loginForm" autocomplete="on" novalidate>
@@ -44,12 +44,21 @@
           <input id="password" name="password" type="password" required placeholder="Enter your Password.." />
         </div>
 
-        <button type="submit" class="btn primary-btn auth-submit-btn">Sign in</button>
+        <button type="submit" class="btn primary-btn auth-submit-btn">Log In</button>
 
         <div class="auth-footer-text">
           Don't have an account? <a href="signup.html">Create one</a>
         </div>
       </form>
+    </div>
+
+    <!-- Guest Card -->
+    <div class="feature-card auth-info-card">
+      <h3>Just Visiting?</h3>
+      <div class="auth-info-points">
+        <p>Explore the platform as a guest to see what RiseFaze has to offer. Your progress won't be saved.</p>
+        <button class="btn primary-btn auth-submit-btn" id="guestBtn">Explore as a Guest</button>
+      </div>
     </div>
   </div>
 </section>

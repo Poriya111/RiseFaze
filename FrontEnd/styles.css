@@ -828,6 +828,11 @@ footer a:hover::after {
   text-align: center;
 }
 
+.auth-info-card .auth-info-points p {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 .auth-info-points {
   display: flex;
   flex-direction: column;
@@ -854,6 +859,7 @@ footer a:hover::after {
 
 .auth-info-point p {
   margin: 0;
+  font-size: 15px; /* Ensure consistency */
 }
 
 /* Signup Hero Background */
