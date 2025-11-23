@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RiseFaze — Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-mode">
+
+<!-- Header -->
+<header class="header">
+  <a href="dashboard.html" class="logo">
+    <img src="media/logo.png" alt="RiseFaze logo" class="logo-img">
+    RiseFaze
+  </a>
+  <nav>
+    <a href="explore.html" class="nav-link">Explore Assets</a>
+    <button class="btn mode-toggle" id="modeToggle">🌙</button>
+    <button class="btn icon-btn" id="newsBtn" title="RiseFaze News">📰</button>
+    <button class="btn icon-btn" id="notificationsBtn" title="Notifications">🔔</button>
+    <div class="profile-menu-container">
+      <button class="btn icon-btn profile-btn" id="profileBtn" title="Profile">🙍‍♂️</button>
+      <!-- Profile Popup/Dropdown -->
+      <div id="profilePopup" class="profile-popup feature-card">
+        <a href="index.html" class="btn primary-btn" style="width: 100%; background: #d94848;">Logout</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- Main Dashboard Content -->
+<main class="dashboard-container lazy-load">
+  <!-- User Welcome -->
+  <div class="dashboard-header">
+    <h1>Welcome back, [Username]!</h1>
+    <p>Here's a snapshot of your empire's performance.</p>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card feature-card">
+      <div class="kpi-label">Total Net Worth</div>
+      <div class="kpi-value">RFC 1,250,000</div>
+      <div class="kpi-change positive">+RFC 50,000 (7d)</div>
+    </div>
+    <div class="kpi-card feature-card">
+      <div class="kpi-label">RFC Balance</div>
+      <div class="kpi-value">RFC 75,000</div>
+      <div class="kpi-subtext">Available to invest</div>
+    </div>
+    <div class="kpi-card feature-card">
+      <div class="kpi-label">Assets Owned</div>
+      <div class="kpi-value">8</div>
+      <div class="kpi-subtext">Across 3 categories</div>
+    </div>
+    <div class="kpi-card feature-card">
+      <div class="kpi-label">Global Rank</div>
+      <div class="kpi-value">#4,821</div>
+      <div class="kpi-change negative">-125 (24h)</div>
+    </div>
+  </div>
+
+  <!-- Dashboard Sections -->
+  <div class="dashboard-main-grid">
+
+
+    <!-- My Assets List -->
+    <div class="dashboard-section feature-card owned-assets-container">
+      <h2>Owned Assets</h2>
+      <div class="owned-assets-grid">
+        <!-- Example Owned Asset Card -->
+        <div class="asset-card owned-asset" data-name="Downtown Office Block" data-price="RFC 500,000" data-icon="🏢" data-description="A prime piece of commercial real estate generating steady passive income.">
+          <div class="asset-icon">🏢</div>
+          <div class="asset-info">
+            <h3>Downtown Office Block</h3>
+            <p class="asset-price">Value: RFC 500,000</p>
+          </div>
+          <button class="btn more-btn">More</button>
+        </div>
+        <!-- Example Owned Asset Card -->
+        <div class="asset-card owned-asset" data-name="Luxury Sports Car" data-price="RFC 250,000" data-icon="🚗" data-description="A high-performance vehicle that increases your influence and status.">
+          <div class="asset-icon">🚗</div>
+          <div class="asset-info">
+            <h3>Luxury Sports Car</h3>
+            <p class="asset-price">Value: RFC 250,000</p>
+          </div>
+          <button class="btn more-btn">More</button>
+        </div>
+        <!-- Example Owned Asset Card -->
+        <div class="asset-card owned-asset" data-name="Suburban Residence" data-price="RFC 180,000" data-icon="🏠" data-description="A comfortable home that provides a stable base for your empire.">
+          <div class="asset-icon">🏠</div>
+          <div class="asset-info">
+            <h3>Suburban Residence</h3>
+            <p class="asset-price">Value: RFC 180,000</p>
+          </div>
+          <button class="btn more-btn">More</button>
+        </div>
+      </div>
+      <a href="explore.html" class="btn primary-btn" style="width: 100%; margin-top: 20px; text-decoration: none;">
+        Explore & Buy New Assets
+      </a>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <p>&copy; 2025 RiseFaze. All rights reserved. <strong>Version 1.0</strong></p>
+    <div class="footer-links">
+      <a href="#">Terms</a>
+      <a href="#">Privacy</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Floating Feedback Button -->
+<button class="feedback-btn" id="feedbackBtn" title="Send Feedback"></button>
+
+<!-- RiseFaze News Modal -->
+<div id="newsModal" class="modal-overlay">
+  <div class="modal-content feature-card">
+    <button class="modal-close-btn">&times;</button>
+    <h2>RiseFaze News</h2>
+    <div class="popup-list">
+      <div class="popup-list-item">
+        <h3>New Asset Category Released: Technology!</h3>
+        <p>Invest in tech startups, software companies, and more. A new era of digital investment has begun!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notifications Modal -->
+<div id="notificationsModal" class="modal-overlay">
+  <div class="modal-content feature-card">
+    <button class="modal-close-btn">&times;</button>
+    <h2>Notifications</h2>
+    <div class="popup-list">
+      <div class="popup-list-item">
+        <p>Your 'Downtown Office Block' generated RFC 5,000 in passive income.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Asset Details Modal -->
+<div id="assetModal" class="modal-overlay">
+  <div class="modal-content feature-card">
+    <button class="modal-close-btn">&times;</button>
+    <div class="modal-asset-icon"></div>
+    <h2 id="modalAssetName">Asset Name</h2>
+    <div class="modal-details">
+      <p><strong>Current Value:</strong> <span id="modalAssetPrice"></span></p>
+      <p><strong>Description:</strong> <span id="modalAssetDescription"></span></p>
+      <!-- More details can be added here -->
+    </div>
+    <div class="modal-actions">
+      <button class="btn primary-btn" style="background: #d94848;">Sell Asset</button>
+    </div>
+  </div>
+</div>
+
+<script src="main.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-

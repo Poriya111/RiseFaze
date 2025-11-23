@@ -21,7 +21,6 @@
     <a href="index.html#about" class="nav-link">Learn More</a>
     <button class="btn mode-toggle" id="modeToggle">🌙</button>
     <a href="login.html" class="btn login-btn">Login</a>
-    <a href="signup.html" class="btn primary-btn">Sign Up</a>
   </nav>
 </header>
 
@@ -134,30 +133,6 @@
 
 <!-- Feedback & hidden elements for main.js -->
 <button class="feedback-btn" id="feedbackBtn" title="Send Feedback"></button>
-
-<script>
-  document.getElementById('signupForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const name = this.fullname.value.trim();
-    const email = this.email.value.trim();
-    const pw = this.password.value;
-    const confirm = this.confirm.value;
-    if (!name || !email || !pw || !confirm) {
-      alert('Please complete all required fields.');
-      return;
-    }
-    if (pw !== confirm) {
-      alert('Passwords do not match.');
-      return;
-    }
-    alert('Account created — replace with backend integration.');
-  });
-
-  const _hid = document.createElement('div');
-  _hid.style.display = 'none';
-  _hid.innerHTML = '<button id="getStartedBtn"></button><button id="seeDemoBtn"></button><button id="startJourneyBtn"></button>';
-  document.body.appendChild(_hid);
-</script>
 
 <script src="main.js"></script>
 </body>
