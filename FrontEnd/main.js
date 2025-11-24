@@ -203,4 +203,161 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Contribution Graph Generation (Dashboard)
+  const contributionContainer = document.querySelector('.graph-squares');
+  if (contributionContainer) {
+    // Clear any placeholder squares
+    contributionContainer.innerHTML = ''; 
+
+    const colors = ['#ebedf0', '#a3b8d1', '#5c83ad', '#285586', '#003169'];
+    
+    const today = new Date();
+    const year = today.getFullYear();
+    const startDate = new Date(year, 0, 1); // January 1st of the current year
+
+    // Update the heading with the current year
+    const graphHeading = document.getElementById('contribution-graph-heading');
+    if (graphHeading) {
+      graphHeading.textContent = `Your Activity in ${year}`;
+    }
+
+    // Determine the number of days in the current year (for leap years)
+    const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
+    const daysInYear = isLeapYear ? 366 : 365;
+
+    for (let i = 0; i < daysInYear; i++) {
+      const currentDate = new Date(startDate);
+      currentDate.setDate(startDate.getDate() + i);
+
+      // Stop if the loop somehow spills into the next year
+      if (currentDate.getFullYear() !== year) continue;
+
+      const level = Math.floor(Math.random() * 5); // Random activity level
+      const square = document.createElement('div');
+      square.className = 'graph-square';
+      square.style.backgroundColor = colors[level];
+      square.title = currentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      contributionContainer.appendChild(square);
+    }
+  }
+
+  // Performance Graph Logic (Dashboard)
+  const chartCanvas = document.getElementById('performanceChart');
+  if (chartCanvas) {
+    const ctx = chartCanvas.getContext('2d');
+
+    // --- Sample Data (replace with actual data from backend) ---
+    const sampleData = {
+      netWorth: {
+        hourly: { labels: ['-5h', '-4h', '-3h', '-2h', '-1h', 'Now'], values: [1240, 1242, 1241, 1245, 1248, 1250] },
+        daily: { labels: ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'Today'], values: [1190, 1200, 1210, 1205, 1220, 1230, 1250] },
+        monthly: { labels: ['-5m', '-4m', '-3m', '-2m', '-1m', 'This Month'], values: [800, 950, 1000, 1100, 1150, 1250] }
+      },
+      rank: {
+        hourly: { labels: ['-5h', '-4h', '-3h', '-2h', '-1h', 'Now'], values: [4825, 4824, 4826, 4822, 4820, 4821] },
+        daily: { labels: ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'Today'], values: [5100, 5050, 4900, 4950, 4850, 4800, 4821] },
+        monthly: { labels: ['-5m', '-4m', '-3m', '-2m', '-1m', 'This Month'], values: [7500, 7000, 6500, 6000, 5500, 4821] }
+      }
+    };
+
+    let currentDataType = 'netWorth';
+    let currentTimeframe = 'daily';
+
+    const chartConfig = {
+      type: 'line',
+      data: {
+        labels: sampleData[currentDataType][currentTimeframe].labels,
+        datasets: [{
+          label: 'Value',
+          data: sampleData[currentDataType][currentTimeframe].values,
+          borderColor: '#003169',
+          backgroundColor: 'rgba(0, 49, 105, 0.1)',
+          fill: true,
+          tension: 0.3,
+          pointBackgroundColor: '#003169',
+          pointBorderColor: '#fff',
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: '#003169',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: {
+              color: '#a5a5a5ff', // Change this value to set the Y-axis text color
+              callback: function(value) {
+                if (currentDataType === 'netWorth') {
+                  // Format the number with commas and show the full value
+                  return `RFC ${(value * 1000).toLocaleString('en-US')}`;
+                }
+                return `#${value}`;
+              }
+            },
+            grid: {
+              color: 'rgba(0,0,0,0.05)'
+            }
+          },
+          x: {
+            ticks: {
+              color: 'rgba(0, 0, 0, 0.7)', // You can also set the X-axis color here
+            },
+            grid: {
+              display: false
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed.y !== null) {
+                  if (currentDataType === 'netWorth') {
+                    label += `RFC ${context.parsed.y * 1000}`;
+                  } else {
+                    label += `#${context.parsed.y}`;
+                  }
+                }
+                return label;
+              }
+            }
+          }
+        }
+      }
+    };
+
+    const performanceChart = new Chart(ctx, chartConfig);
+
+    const updateChart = () => {
+      const newData = sampleData[currentDataType][currentTimeframe];
+      performanceChart.data.labels = newData.labels;
+      performanceChart.data.datasets[0].data = newData.values;
+      performanceChart.options.scales.y.reverse = currentDataType === 'rank'; // Invert Y-axis for rank
+      performanceChart.update();
+    };
+
+    document.querySelectorAll('.chart-toggle-btn, .time-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentDataType = btn.dataset.type || currentDataType;
+        currentTimeframe = btn.dataset.time || currentTimeframe;
+        
+        document.querySelectorAll('.chart-toggle-btn, .time-toggle-btn').forEach(b => b.classList.remove('active'));
+        document.querySelector(`.chart-toggle-btn[data-type="${currentDataType}"]`).classList.add('active');
+        document.querySelector(`.time-toggle-btn[data-time="${currentTimeframe}"]`).classList.add('active');
+        
+        updateChart();
+      });
+    });
+  }
 });
