@@ -141,6 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Show modal
         assetModal.classList.add('visible');
+        document.body.classList.add('popup-open');
       });
     });
 
@@ -148,6 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
       assetModal.classList.remove('visible');
     };
 
+    // The closeModal function is only called when the asset modal is closed, so we can remove the class here.
     closeModalBtn.addEventListener('click', closeModal);
     assetModal.addEventListener('click', (e) => {
       // Close if clicked on the overlay itself, not the content
@@ -170,6 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const closeAllPopups = () => {
     allPopups.forEach(p => p && p.classList.remove('visible'));
+    document.body.classList.remove('popup-open');
   };
 
   const setupPopup = (button, popup) => {
@@ -181,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeAllPopups();
       if (!isVisible) {
         popup.classList.add('visible');
+        document.body.classList.add('popup-open');
       }
     });
 
@@ -357,6 +361,19 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector(`.time-toggle-btn[data-time="${currentTimeframe}"]`).classList.add('active');
         
         updateChart();
+      });
+    });
+  }
+
+  // FAQ Accordion Logic (Help Page)
+  const faqItems = document.querySelectorAll('.faq-item');
+  if (faqItems.length > 0) {
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+      question.addEventListener('click', () => {
+        const wasActive = item.classList.contains('active');
+        faqItems.forEach(i => i.classList.remove('active')); // Close all others
+        if (!wasActive) item.classList.add('active'); // Open the clicked one if it wasn't already open
       });
     });
   }
