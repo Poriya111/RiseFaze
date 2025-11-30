@@ -15,10 +15,22 @@ document.addEventListener('DOMContentLoaded', () => {
   // Dark/Light mode toggle (guard in case element missing)
   const modeToggle = document.getElementById('modeToggle');
   if (modeToggle) {
+    // Check for saved theme in localStorage and apply it on load
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark-mode') {
+      document.body.classList.add('dark-mode');
+      document.body.classList.remove('light-mode');
+      modeToggle.textContent = '☀️';
+    } else {
+      document.body.classList.add('light-mode'); // Default to light mode
+    }
+
     modeToggle.addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
       document.body.classList.toggle('light-mode');
       modeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+      // Save the user's preference to localStorage
+      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode');
     });
   }
 
