@@ -104,7 +104,9 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Passwords do not match.');
         return;
       }
-      alert('Account created — replace with backend integration.');
+      // Simulate successful account creation and redirect
+      alert('Account created! Redirecting to your new dashboard...');
+      window.location.href = 'dashboard.html';
     });
   }
 
@@ -119,7 +121,26 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Please fill all required fields.');
         return;
       }
-      alert('Signing in — replace with real auth flow.');
+      // Simulate successful login and redirect
+      alert('Signing in! Redirecting to your dashboard...');
+      window.location.href = 'dashboard.html';
+    });
+  }
+
+  // Contact form submission
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const name = this.name.value.trim();
+      const email = this.email.value.trim();
+      const message = this.message.value.trim();
+      if (!name || !email || !message) {
+        alert('Please fill out all fields.');
+        return;
+      }
+      alert('Thank you for your message! We will get back to you shortly.');
+      this.reset(); // Clear the form
     });
   }
 
@@ -151,6 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
         assetModal.querySelector('.modal-asset-icon').textContent = icon;
         assetModal.querySelector('#modalAssetDescription').textContent = description;
 
+        // Simulate calculating a bank buy price (e.g., 95% of market value)
+        const bankPrice = parseFloat(price.replace('RFC ', '').replace(/,/g, '')) * 0.95;
+        assetModal.querySelector('#modalBankBuyPrice').textContent = `RFC ${bankPrice.toLocaleString()}`;
+
         // Show modal
         assetModal.classList.add('visible');
         document.body.classList.add('popup-open');
@@ -169,6 +194,22 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModal();
       }
     });
+
+    // Add logic for the "Sell to Bank" button
+    const sellAssetBtn = document.getElementById('sellAssetBtn');
+    if (sellAssetBtn) {
+      sellAssetBtn.addEventListener('click', () => {
+        const assetName = assetModal.querySelector('#modalAssetName').textContent;
+        // Find the corresponding asset card on the dashboard and remove it
+        const assetCardToRemove = document.querySelector(`.asset-card[data-name="${assetName}"]`);
+        if (assetCardToRemove) {
+          assetCardToRemove.remove();
+        }
+        closeModal();
+        alert(`'${assetName}' sold to the RiseFaze Bank! Your RFC balance has been updated.`);
+        checkOwnedAssets(); // Re-check if the owned assets grid is now empty
+      });
+    }
   }
 
   // Navbar Popups Logic (Dashboard)
@@ -237,24 +278,8 @@ document.addEventListener('DOMContentLoaded', () => {
       graphHeading.textContent = `Your Activity in ${year}`;
     }
 
-    // Determine the number of days in the current year (for leap years)
-    const isLeapYear = (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-    const daysInYear = isLeapYear ? 366 : 365;
-
-    for (let i = 0; i < daysInYear; i++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + i);
-
-      // Stop if the loop somehow spills into the next year
-      if (currentDate.getFullYear() !== year) continue;
-
-      const level = Math.floor(Math.random() * 5); // Random activity level
-      const square = document.createElement('div');
-      square.className = 'graph-square';
-      square.style.backgroundColor = colors[level];
-      square.title = currentDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-      contributionContainer.appendChild(square);
-    }
+    // Display an empty state message until backend data is available
+    contributionContainer.innerHTML = '<p class="loading-message">Loading activity data...</p>';
   }
 
   // Performance Graph Logic (Dashboard)
@@ -263,18 +288,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = chartCanvas.getContext('2d');
 
     // --- Sample Data (replace with actual data from backend) ---
-    const sampleData = {
-      netWorth: {
-        hourly: { labels: ['-5h', '-4h', '-3h', '-2h', '-1h', 'Now'], values: [1240, 1242, 1241, 1245, 1248, 1250] },
-        daily: { labels: ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'Today'], values: [1190, 1200, 1210, 1205, 1220, 1230, 1250] },
-        monthly: { labels: ['-5m', '-4m', '-3m', '-2m', '-1m', 'This Month'], values: [800, 950, 1000, 1100, 1150, 1250] }
-      },
-      rank: {
-        hourly: { labels: ['-5h', '-4h', '-3h', '-2h', '-1h', 'Now'], values: [4825, 4824, 4826, 4822, 4820, 4821] },
-        daily: { labels: ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'Today'], values: [5100, 5050, 4900, 4950, 4850, 4800, 4821] },
-        monthly: { labels: ['-5m', '-4m', '-3m', '-2m', '-1m', 'This Month'], values: [7500, 7000, 6500, 6000, 5500, 4821] }
-      }
-    };
+    // const sampleData = {
+    //   netWorth: {
+    //     hourly: { labels: ['-5h', '-4h', '-3h', '-2h', '-1h', 'Now'], values: [1240, 1242, 1241, 1245, 1248, 1250] },
+    //     daily: { labels: ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'Today'], values: [1190, 1200, 1210, 1205, 1220, 1230, 1250] },
+    //     monthly: { labels: ['-5m', '-4m', '-3m', '-2m', '-1m', 'This Month'], values: [800, 950, 1000, 1100, 1150, 1250] }
+    //   },
+    //   rank: {
+    //     hourly: { labels: ['-5h', '-4h', '-3h', '-2h', '-1h', 'Now'], values: [4825, 4824, 4826, 4822, 4820, 4821] },
+    //     daily: { labels: ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'Today'], values: [5100, 5050, 4900, 4950, 4850, 4800, 4821] },
+    //     monthly: { labels: ['-5m', '-4m', '-3m', '-2m', '-1m', 'This Month'], values: [7500, 7000, 6500, 6000, 5500, 4821] }
+    //   }
+    // };
 
     let currentDataType = 'netWorth';
     let currentTimeframe = 'daily';
@@ -282,10 +307,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const chartConfig = {
       type: 'line',
       data: {
-        labels: sampleData[currentDataType][currentTimeframe].labels,
+        labels: [], // sampleData[currentDataType][currentTimeframe].labels,
         datasets: [{
           label: 'Value',
-          data: sampleData[currentDataType][currentTimeframe].values,
+          data: [], // sampleData[currentDataType][currentTimeframe].values,
           borderColor: '#003169',
           backgroundColor: 'rgba(0, 49, 105, 0.1)',
           fill: true,
@@ -356,10 +381,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const performanceChart = new Chart(ctx, chartConfig);
 
     const updateChart = () => {
-      const newData = sampleData[currentDataType][currentTimeframe];
-      performanceChart.data.labels = newData.labels;
-      performanceChart.data.datasets[0].data = newData.values;
-      performanceChart.options.scales.y.reverse = currentDataType === 'rank'; // Invert Y-axis for rank
+      // This part will be populated by backend data. For now, it just clears the chart.
+      // const newData = sampleData[currentDataType][currentTimeframe];
+      // performanceChart.data.labels = newData.labels;
+      // performanceChart.data.datasets[0].data = newData.values;
+      performanceChart.data.labels = [];
+      performanceChart.data.datasets[0].data = [];
+      performanceChart.options.scales.y.reverse = currentDataType === 'rank';
       performanceChart.update();
     };
 
@@ -388,5 +416,178 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!wasActive) item.classList.add('active'); // Open the clicked one if it wasn't already open
       });
     });
+  }
+
+  // --- Dynamic Data Population for Explore Page ---
+
+  // Function to render assets in the marketplace
+  const renderMarketplaceAssets = () => {
+    const assetsGrid = document.querySelector('.assets-grid');
+    const loadingMessage = document.getElementById('assets-loading');
+    if (!assetsGrid || !loadingMessage) return;
+
+    // Mock data for assets sold by the bank
+    // const bankAssets = [
+    //   { icon: '🏢', name: 'Downtown Office Block', price: 500000, description: 'A prime piece of commercial real estate generating steady passive income.' },
+    //   { icon: '🎨', name: 'Digital Art NFT', price: 120000, description: 'A unique piece of digital art whose value fluctuates with market trends.' },
+    //   { icon: '📈', name: 'Tech Startup Shares', price: 300000, description: 'Equity in a promising tech startup with high growth potential.' },
+    //   { icon: '🚢', name: 'Shipping Port', price: 1200000, description: 'A major logistics hub that generates income from global trade.' },
+    //   { icon: '⚡️', name: 'Solar Farm', price: 750000, description: 'A renewable energy asset providing consistent RFC returns.' }
+    // ];
+    const bankAssets = []; // Default to empty
+
+    // Simulate a network delay
+    setTimeout(() => {
+      loadingMessage.style.display = 'none'; // Hide loading message
+
+      if (bankAssets.length === 0) {
+        assetsGrid.innerHTML = '<p class="empty-state-message">The RiseFaze Bank has no assets for sale at this time.</p>';
+        return;
+      }
+
+      bankAssets.forEach(asset => {
+        const card = document.createElement('div');
+        card.className = 'asset-card';
+        card.innerHTML = `
+          <div class="asset-icon">${asset.icon}</div>
+          <div class="asset-info">
+            <h3>${asset.name}</h3>
+            <p class="asset-price">RFC ${asset.price.toLocaleString()}</p>
+          </div>
+          <p class="asset-source">Sold by RiseFaze Assets Bank</p>
+          <p class="asset-description">${asset.description}</p>
+          <button class="btn primary-btn">Purchase Asset</button>
+        `;
+        assetsGrid.appendChild(card);
+      });
+    }, 1500); // 1.5 second delay to show the loading message
+  };
+
+  // Function to render the global leaderboard
+  const renderLeaderboard = () => {
+    const leaderboardList = document.querySelector('.leaderboard-list');
+    const loadingMessage = document.getElementById('leaderboard-loading');
+    if (!leaderboardList || !loadingMessage) return;
+
+    // Mock data for the leaderboard
+    // const leaderboardData = [
+    //   { rank: 1, name: 'Alex Mercer', netWorth: 15200000 },
+    //   { rank: 2, name: 'Jasmine Lee', netWorth: 12800000 },
+    //   { rank: 3, name: 'Kenji Tanaka', netWorth: 11500000 },
+    //   { rank: 4, name: 'Sofia Rossi', netWorth: 9800000 },
+    //   { rank: 5, name: 'Ben Carter', netWorth: 9100000 }
+    // ];
+    const leaderboardData = []; // Default to empty
+
+    // Simulate a network delay
+    setTimeout(() => {
+      loadingMessage.style.display = 'none'; // Hide loading message
+
+      if (leaderboardData.length === 0) {
+        leaderboardList.innerHTML = '<p class="empty-state-message">Leaderboard data is currently unavailable.</p>';
+        return;
+      }
+
+      leaderboardData.forEach(user => {
+        const item = document.createElement('li');
+        item.className = 'leaderboard-item';
+        item.innerHTML = `
+          <span class="rank">${user.rank}</span>
+          <span class="user-name">${user.name}</span>
+          <span class="net-worth">RFC ${user.netWorth.toLocaleString()}</span>
+        `;
+        leaderboardList.appendChild(item);
+      });
+    }, 1000); // 1 second delay
+  };
+
+  // --- Dynamic Data Population for Dashboard Page ---
+
+  // Function to handle empty state for owned assets
+  const checkOwnedAssets = () => {
+    const assetsContainer = document.querySelector('.owned-assets-container');
+    if (!assetsContainer) return;
+
+    const grid = assetsContainer.querySelector('.owned-assets-grid');
+    const exploreBtn = assetsContainer.querySelector('#exploreAssetsBtn');
+
+    // Check if there are any .asset-card elements left.
+    if (grid.children.length === 0) {
+      grid.innerHTML = '<p class="empty-state-message">You do not own any assets yet. Visit the explore page to start building your empire!</p>';
+      // Optional: Make the explore button more prominent
+      exploreBtn.style.marginTop = '20px';
+    }
+  };
+
+  // Function to populate dashboard with mock data
+  const renderDashboardData = () => {
+    // Mock data that would come from a backend API
+    // const userData = {
+    //   username: 'Poriya',
+    //   netWorth: 1250000,
+    //   netWorthChange: 50000,
+    //   rfcBalance: 75000,
+    //   assetsOwned: 3,
+    //   globalRank: 4821,
+    //   globalRankChange: -125,
+    //   ownedAssets: [
+    //     { name: 'Downtown Office Block', price: 500000, icon: '🏢', description: 'A prime piece of commercial real estate generating steady passive income.' },
+    //     { name: 'Luxury Sports Car', price: 250000, icon: '🚗', description: 'A high-performance vehicle that increases your influence and status.' },
+    //     { name: 'Suburban Residence', price: 180000, icon: '🏠', description: 'A comfortable home that provides a stable base for your empire.' }
+    //   ]
+    // };
+
+    // The code below would be used to populate the DOM once `userData` is fetched from the backend.
+    // For now, it's commented out to ensure the page loads empty.
+
+    // if (userData) {
+    //   // Populate KPIs
+    //   document.getElementById('username-placeholder').textContent = userData.username;
+    //   document.getElementById('kpi-net-worth').textContent = `RFC ${userData.netWorth.toLocaleString()}`;
+    //   document.getElementById('kpi-net-worth-change').textContent = `+RFC ${userData.netWorthChange.toLocaleString()} (7d)`;
+    //   document.getElementById('kpi-net-worth-change').classList.add('positive');
+    //   document.getElementById('kpi-rfc-balance').textContent = `RFC ${userData.rfcBalance.toLocaleString()}`;
+    //   document.getElementById('kpi-assets-owned').textContent = userData.assetsOwned;
+    //   document.getElementById('kpi-global-rank').textContent = `#${userData.globalRank.toLocaleString()}`;
+    //   document.getElementById('kpi-global-rank-change').textContent = `${userData.globalRankChange.toLocaleString()} (24h)`;
+    //   document.getElementById('kpi-global-rank-change').classList.add('negative');
+
+    //   // Populate Owned Assets
+    //   const ownedAssetsGrid = document.querySelector('.owned-assets-grid');
+    //   userData.ownedAssets.forEach(asset => {
+    //     const card = document.createElement('div');
+    //     card.className = 'asset-card owned-asset';
+    //     card.dataset.name = asset.name;
+    //     card.dataset.price = `RFC ${asset.price.toLocaleString()}`;
+    //     card.dataset.icon = asset.icon;
+    //     card.dataset.description = asset.description;
+    //     card.innerHTML = `
+    //       <div class="asset-icon">${asset.icon}</div>
+    //       <div class="asset-info">
+    //         <h3>${asset.name}</h3>
+    //         <p class="asset-price">Value: RFC ${asset.price.toLocaleString()}</p>
+    //       </div>
+    //       <button class="btn more-btn">More</button>
+    //     `;
+    //     ownedAssetsGrid.appendChild(card);
+    //   });
+    // }
+
+    // Re-initialize event listeners for the newly created "More" buttons
+    initializeAssetModalLogic();
+  };
+
+  // --- Initialize Page-Specific Logic ---
+
+  // Run logic for the explore page
+  if (document.querySelector('.assets-container')) {
+    renderMarketplaceAssets();
+    renderLeaderboard();
+  }
+
+  // Run logic for the dashboard page
+  if (document.querySelector('.dashboard-container')) {
+    renderDashboardData();
+    checkOwnedAssets();
   }
 });

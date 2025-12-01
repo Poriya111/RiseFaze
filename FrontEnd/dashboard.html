@@ -36,7 +36,7 @@
 <main class="dashboard-container lazy-load">
   <!-- User Welcome -->
   <div class="dashboard-header">
-    <h1>Welcome back, [Username]!</h1>
+    <h1>Welcome back, <span id="username-placeholder">...</span>!</h1>
     <p>Here's a snapshot of your empire's performance.</p>
   </div>
 
@@ -44,23 +44,23 @@
   <div class="kpi-grid">
     <div class="kpi-card feature-card">
       <div class="kpi-label">Total Net Worth</div>
-      <div class="kpi-value">RFC 1,250,000</div>
-      <div class="kpi-change positive">+RFC 50,000 (7d)</div>
+      <div class="kpi-value" id="kpi-net-worth">--</div>
+      <div class="kpi-change" id="kpi-net-worth-change">--</div>
     </div>
     <div class="kpi-card feature-card">
       <div class="kpi-label">RFC Balance</div>
-      <div class="kpi-value">RFC 75,000</div>
+      <div class="kpi-value" id="kpi-rfc-balance">--</div>
       <div class="kpi-subtext">Available to invest</div>
     </div>
     <div class="kpi-card feature-card">
       <div class="kpi-label">Assets Owned</div>
-      <div class="kpi-value">8</div>
+      <div class="kpi-value" id="kpi-assets-owned">--</div>
       <div class="kpi-subtext">Across 3 categories</div>
     </div>
     <div class="kpi-card feature-card">
       <div class="kpi-label">Global Rank</div>
-      <div class="kpi-value">#4,821</div>
-      <div class="kpi-change negative">-125 (24h)</div>
+      <div class="kpi-value" id="kpi-global-rank">--</div>
+      <div class="kpi-change" id="kpi-global-rank-change">--</div>
     </div>
   </div>
 
@@ -107,33 +107,7 @@
     <div class="dashboard-section feature-card owned-assets-container">
       <h2>Owned Assets</h2>
       <div class="owned-assets-grid">
-        <!-- Example Owned Asset Card -->
-        <div class="asset-card owned-asset" data-name="Downtown Office Block" data-price="RFC 500,000" data-icon="🏢" data-description="A prime piece of commercial real estate generating steady passive income.">
-          <div class="asset-icon">🏢</div>
-          <div class="asset-info">
-            <h3>Downtown Office Block</h3>
-            <p class="asset-price">Value: RFC 500,000</p>
-          </div>
-          <button class="btn more-btn">More</button>
-        </div>
-        <!-- Example Owned Asset Card -->
-        <div class="asset-card owned-asset" data-name="Luxury Sports Car" data-price="RFC 250,000" data-icon="🚗" data-description="A high-performance vehicle that increases your influence and status.">
-          <div class="asset-icon">🚗</div>
-          <div class="asset-info">
-            <h3>Luxury Sports Car</h3>
-            <p class="asset-price">Value: RFC 250,000</p>
-          </div>
-          <button class="btn more-btn">More</button>
-        </div>
-        <!-- Example Owned Asset Card -->
-        <div class="asset-card owned-asset" data-name="Suburban Residence" data-price="RFC 180,000" data-icon="🏠" data-description="A comfortable home that provides a stable base for your empire.">
-          <div class="asset-icon">🏠</div>
-          <div class="asset-info">
-            <h3>Suburban Residence</h3>
-            <p class="asset-price">Value: RFC 180,000</p>
-          </div>
-          <button class="btn more-btn">More</button>
-        </div>
+        <!-- Asset cards will be dynamically inserted here by main.js -->
       </div>
       <a href="explore.html" class="btn primary-btn" id="exploreAssetsBtn">Explore & Buy New Assets</a>
     </div>
@@ -147,6 +121,11 @@
 <footer class="footer">
   <div class="footer-content">
     <p>&copy; 2025 RiseFaze. All rights reserved. <strong>Version 1.0</strong></p>
+    <div class="footer-links">
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
+    </div>
   </div>
 </footer>
 
@@ -159,10 +138,7 @@
     <button class="modal-close-btn">&times;</button>
     <h2>RiseFaze News</h2>
     <div class="popup-list">
-      <div class="popup-list-item">
-        <h3>New Asset Category Released: Technology!</h3>
-        <p>Invest in tech startups, software companies, and more. A new era of digital investment has begun!</p>
-      </div>
+      <p class="empty-state-message">No recent news.</p>
     </div>
   </div>
 </div>
@@ -173,9 +149,7 @@
     <button class="modal-close-btn">&times;</button>
     <h2>Notifications</h2>
     <div class="popup-list">
-      <div class="popup-list-item">
-        <p>Your 'Downtown Office Block' generated RFC 5,000 in passive income.</p>
-      </div>
+      <p class="empty-state-message">You have no new notifications.</p>
     </div>
   </div>
 </div>
@@ -190,9 +164,10 @@
       <p><strong>Current Value:</strong> <span id="modalAssetPrice"></span></p>
       <p><strong>Description:</strong> <span id="modalAssetDescription"></span></p>
       <!-- More details can be added here -->
+      <p><strong>Bank Buy Price:</strong> <span id="modalBankBuyPrice">RFC 0</span></p>
     </div>
     <div class="modal-actions">
-      <button class="btn primary-btn" id="sellAssetBtn">Sell Asset</button>
+      <button class="btn primary-btn" id="sellAssetBtn" data-action="sell-to-bank">Sell to RiseFaze Assets Bank</button>
     </div>
   </div>
 </div>

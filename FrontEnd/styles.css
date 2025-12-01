@@ -474,7 +474,7 @@ body.dark-mode .hero {
   transform: rotate(45deg);
 }
 
-.feature-card:hover {
+body.home-page .feature-card:hover {
   transform: translateY(-15px) scale(1.05);
   box-shadow: 0 30px 60px rgba(0,0,0,0.2);
   border-color: rgba(95, 150, 212, 0.5);
@@ -491,7 +491,6 @@ body.dark-mode .hero {
   transition: transform 0.3s ease;
 }
 
-.feature-card:hover .feature-icon {
   transform: scale(1.2) rotate(10deg);
 }
 
@@ -863,10 +862,6 @@ footer a:hover::after {
   transition: background 0.3s ease;
 }
 
-.auth-info-point:hover {
-  background: #ffffff1a;
-}
-
 .auth-info-icon {
   font-size: 28px;
   flex-shrink: 0;
@@ -993,13 +988,6 @@ footer a:hover::after {
   display: flex;
   flex-direction: column;
 }
-
-.asset-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-  border-color: rgba(95, 150, 212, 0.5);
-}
-
 .asset-icon {
   font-size: 50px;
   margin-bottom: 15px;
@@ -1117,10 +1105,6 @@ footer a:hover::after {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   transition: background 0.3s ease;
-}
-
-.leaderboard-item:hover {
-  background: rgba(255, 255, 255, 0.1);
 }
 
 .leaderboard-item .rank {
@@ -1243,16 +1227,6 @@ footer a:hover::after {
   opacity: 0.6;
 }
 
-/* Asset List in Dashboard */
-.asset-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
 .asset-list-item {
   display: flex;
   align-items: center;
@@ -1274,13 +1248,6 @@ footer a:hover::after {
 .asset-value {
   font-weight: 600;
   color: var(--accent);
-}
-
-/* Disable hover effect for cards in the dashboard */
-.dashboard-container .feature-card:hover {
-  transform: none;
-  box-shadow: none;
-  border-color: rgba(255,255,255,0.2);
 }
 
 /* Also disable the shimmer animation on dashboard cards */
@@ -1337,11 +1304,6 @@ footer a:hover::after {
   font-size: 32px;
   padding: 10px;
   margin-bottom: 0;
-}
-
-.asset-card.owned-asset:hover {
-  transform: translateX(5px); /* Subtle hover for list items */
-  box-shadow: none;
 }
 
 /* "More" button on asset cards */
@@ -1532,10 +1494,6 @@ body.popup-open {
   cursor: pointer;
   font-weight: 600;
   font-size: 18px;
-}
-
-.faq-question:hover {
-  color: var(--accent);
 }
 
 .faq-icon {
