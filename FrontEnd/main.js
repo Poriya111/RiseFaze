@@ -1,5 +1,31 @@
 // Run this function when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Global UI setup based on login state ---
+  const checkLoginState = () => {
+    // In a real app, you'd check for a valid auth token
+    const isLoggedIn = localStorage.getItem('authToken'); // This will be set on login
+
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const nav = document.querySelector('header nav');
+
+    if (isLoggedIn && nav) {
+      // User is logged in, show dashboard button
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (signupBtn) signupBtn.style.display = 'none';
+
+      // Add "Go to Dashboard" button if it doesn't exist
+      if (!document.getElementById('dashboardNavBtn')) {
+        const dashboardBtn = document.createElement('a');
+        dashboardBtn.href = 'dashboard.html';
+        dashboardBtn.className = 'btn primary-btn';
+        dashboardBtn.id = 'dashboardNavBtn';
+        dashboardBtn.textContent = 'Go to Dashboard';
+        nav.appendChild(dashboardBtn);
+      }
+    }
+  };
+
   // Lazy loading for sections
   const lazyElements = document.querySelectorAll('.lazy-load');
   const observer = new IntersectionObserver((entries) => {
@@ -11,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   lazyElements.forEach(el => observer.observe(el));
+
+  // Check login state on every page load to set the correct nav buttons
+  checkLoginState();
 
   // Dark/Light mode toggle (guard in case element missing)
   const modeToggle = document.getElementById('modeToggle');
@@ -121,8 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Please fill all required fields.');
         return;
       }
-      // Simulate successful login and redirect
-      alert('Signing in! Redirecting to your dashboard...');
+      // In a real app, you would get a token from your backend here.
+      // For now, we'll simulate it by setting an item in localStorage.
+      localStorage.setItem('authToken', 'dummy_token_for_ui_testing');
+
+      // Redirect to the dashboard
       window.location.href = 'dashboard.html';
     });
   }
@@ -152,6 +184,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(_hid);
   }
 
+  // Logout Logic
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('authToken'); // Clear the token
+      window.location.href = 'index.html'; // Redirect to home
+    });
+  }
   // Asset Modal Logic (Dashboard)
   const assetModal = document.getElementById('assetModal');
   if (assetModal) {
