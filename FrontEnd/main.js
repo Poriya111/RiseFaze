@@ -1,5 +1,30 @@
 // Run this function when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // --- Global UI setup based on login state ---
+  const checkLoginState = () => {
+    // In a real app, you'd check for a valid auth token
+    const isLoggedIn = localStorage.getItem('authToken');
+
+    const loginBtn = document.getElementById('loginBtn');
+    const signupBtn = document.getElementById('signupBtn');
+    const nav = document.querySelector('header nav');
+
+    if (isLoggedIn && nav) {
+      // User is logged in, show dashboard button
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (signupBtn) signupBtn.style.display = 'none';
+
+      // Add "Go to Dashboard" button if it doesn't exist
+      if (!document.getElementById('dashboardNavBtn')) {
+        const dashboardBtn = document.createElement('a');
+        dashboardBtn.href = 'dashboard.html';
+        dashboardBtn.className = 'btn primary-btn';
+        dashboardBtn.id = 'dashboardNavBtn';
+        dashboardBtn.textContent = 'Go to Dashboard';
+        nav.appendChild(dashboardBtn);
+      }
+    }
+  };
   // Lazy loading for sections
   const lazyElements = document.querySelectorAll('.lazy-load');
   const observer = new IntersectionObserver((entries) => {
@@ -11,6 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   lazyElements.forEach(el => observer.observe(el));
+
+  // Check login state on every page load to set the correct nav buttons
+  checkLoginState();
 
   // Dark/Light mode toggle (guard in case element missing)
   const modeToggle = document.getElementById('modeToggle');
@@ -90,12 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Signup form validation
   const signupForm = document.getElementById('signupForm');
   if (signupForm) {
-    signupForm.addEventListener('submit', function (e) {
+    signupForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       const name = this.fullname.value.trim();
       const email = this.email.value.trim();
       const pw = this.password.value;
       const confirm = this.confirm.value;
+
       if (!name || !email || !pw || !confirm) {
         alert('Please complete all required fields.');
         return;
@@ -104,16 +133,34 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Passwords do not match.');
         return;
       }
-      // Simulate successful account creation and redirect
-      alert('Account created! Redirecting to your new dashboard...');
-      window.location.href = 'dashboard.html';
+
+      try {
+        const response = await fetch('http://localhost:5001/api/users/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, password: pw }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Something went wrong');
+        }
+
+        localStorage.setItem('authToken', data.token);
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        alert(`Signup failed: ${error.message}`);
+      }
     });
   }
 
   // Login form validation
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
-    loginForm.addEventListener('submit', function (e) {
+    loginForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       const email = this.email.value.trim();
       const pw = this.password.value;
@@ -121,9 +168,28 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Please fill all required fields.');
         return;
       }
-      // Simulate successful login and redirect
-      alert('Signing in! Redirecting to your dashboard...');
-      window.location.href = 'dashboard.html';
+
+      try {
+        const response = await fetch('http://localhost:5001/api/users/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password: pw }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Something went wrong');
+        }
+
+        // Store the token and redirect
+        localStorage.setItem('authToken', data.token);
+        window.location.href = 'dashboard.html';
+      } catch (error) {
+        alert(`Login failed: ${error.message}`);
+      }
     });
   }
 
@@ -152,41 +218,26 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(_hid);
   }
 
-  // Asset Modal Logic (Dashboard)
-  const assetModal = document.getElementById('assetModal');
-  if (assetModal) {
-    const moreButtons = document.querySelectorAll('.more-btn');
-    const closeModalBtn = assetModal.querySelector('.modal-close-btn');
-
-    moreButtons.forEach(button => {
-      button.addEventListener('click', (e) => {
-        const card = e.target.closest('.asset-card');
-        const name = card.dataset.name;
-        const price = card.dataset.price;
-        const icon = card.dataset.icon;
-        const description = card.dataset.description;
-
-        // Populate modal
-        assetModal.querySelector('#modalAssetName').textContent = name;
-        assetModal.querySelector('#modalAssetPrice').textContent = price;
-        assetModal.querySelector('.modal-asset-icon').textContent = icon;
-        assetModal.querySelector('#modalAssetDescription').textContent = description;
-
-        // Simulate calculating a bank buy price (e.g., 95% of market value)
-        const bankPrice = parseFloat(price.replace('RFC ', '').replace(/,/g, '')) * 0.95;
-        assetModal.querySelector('#modalBankBuyPrice').textContent = `RFC ${bankPrice.toLocaleString()}`;
-
-        // Show modal
-        assetModal.classList.add('visible');
-        document.body.classList.add('popup-open');
-      });
+  // Logout Logic
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      localStorage.removeItem('authToken'); // Clear the token
+      window.location.href = 'index.html'; // Redirect to home
     });
+  }
 
+  // Asset Modal Logic (Dashboard)
+  const assetModal = document.getElementById('assetModal'); // Main declaration
+  if (assetModal) {
+    const closeModalBtn = assetModal.querySelector('.modal-close-btn');
+ 
     const closeModal = () => {
       assetModal.classList.remove('visible');
+      document.body.classList.remove('popup-open');
     };
-
-    // The closeModal function is only called when the asset modal is closed, so we can remove the class here.
+ 
     closeModalBtn.addEventListener('click', closeModal);
     assetModal.addEventListener('click', (e) => {
       // Close if clicked on the overlay itself, not the content
@@ -194,7 +245,34 @@ document.addEventListener('DOMContentLoaded', () => {
         closeModal();
       }
     });
-
+ 
+    // Use event delegation for "More" buttons on dynamically loaded assets
+    document.addEventListener('click', (e) => {
+      if (e.target && e.target.classList.contains('more-btn')) {
+        const card = e.target.closest('.asset-card');
+        if (!card) return;
+ 
+        const name = card.dataset.name;
+        const price = card.dataset.price;
+        const icon = card.dataset.icon;
+        const description = card.dataset.description;
+ 
+        // Populate modal
+        assetModal.querySelector('#modalAssetName').textContent = name;
+        assetModal.querySelector('#modalAssetPrice').textContent = `RFC ${parseInt(price).toLocaleString()}`;
+        assetModal.querySelector('.modal-asset-icon').textContent = icon;
+        assetModal.querySelector('#modalAssetDescription').textContent = description;
+ 
+        // Simulate calculating a bank buy price (e.g., 95% of market value)
+        const bankPrice = parseFloat(price) * 0.95;
+        assetModal.querySelector('#modalBankBuyPrice').textContent = `RFC ${bankPrice.toLocaleString()}`;
+ 
+        // Show modal
+        assetModal.classList.add('visible');
+        document.body.classList.add('popup-open');
+      }
+    });
+ 
     // Add logic for the "Sell to Bank" button
     const sellAssetBtn = document.getElementById('sellAssetBtn');
     if (sellAssetBtn) {
@@ -245,6 +323,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalBtn = popup.querySelector('.modal-close-btn');
     if (closeModalBtn) {
       closeModalBtn.addEventListener('click', closeAllPopups);
+    }
+
+    // Add overlay click to close for all modals
+    if (popup.classList.contains('modal-overlay')) {
+      popup.addEventListener('click', (e) => {
+        if (e.target === popup) closeAllPopups();
+      });
     }
   };
 
@@ -421,46 +506,44 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Dynamic Data Population for Explore Page ---
 
   // Function to render assets in the marketplace
-  const renderMarketplaceAssets = () => {
+  const renderMarketplaceAssets = async () => {
     const assetsGrid = document.querySelector('.assets-grid');
     const loadingMessage = document.getElementById('assets-loading');
     if (!assetsGrid || !loadingMessage) return;
 
-    // Mock data for assets sold by the bank
-    // const bankAssets = [
-    //   { icon: '🏢', name: 'Downtown Office Block', price: 500000, description: 'A prime piece of commercial real estate generating steady passive income.' },
-    //   { icon: '🎨', name: 'Digital Art NFT', price: 120000, description: 'A unique piece of digital art whose value fluctuates with market trends.' },
-    //   { icon: '📈', name: 'Tech Startup Shares', price: 300000, description: 'Equity in a promising tech startup with high growth potential.' },
-    //   { icon: '🚢', name: 'Shipping Port', price: 1200000, description: 'A major logistics hub that generates income from global trade.' },
-    //   { icon: '⚡️', name: 'Solar Farm', price: 750000, description: 'A renewable energy asset providing consistent RFC returns.' }
-    // ];
-    const bankAssets = []; // Default to empty
+    try {
+      const response = await fetch('http://localhost:5001/api/assets/explore');
+      const bankAssets = await response.json();
 
-    // Simulate a network delay
-    setTimeout(() => {
       loadingMessage.style.display = 'none'; // Hide loading message
 
       if (bankAssets.length === 0) {
         assetsGrid.innerHTML = '<p class="empty-state-message">The RiseFaze Bank has no assets for sale at this time.</p>';
         return;
       }
-
+      
+      assetsGrid.innerHTML = ''; // Clear loading message
       bankAssets.forEach(asset => {
         const card = document.createElement('div');
         card.className = 'asset-card';
+        // Add a data attribute for the asset ID for future use (e.g., buying)
+        card.dataset.id = asset._id;
         card.innerHTML = `
-          <div class="asset-icon">${asset.icon}</div>
+          <div class="asset-icon">${asset.emoji}</div>
           <div class="asset-info">
             <h3>${asset.name}</h3>
             <p class="asset-price">RFC ${asset.price.toLocaleString()}</p>
           </div>
           <p class="asset-source">Sold by RiseFaze Assets Bank</p>
           <p class="asset-description">${asset.description}</p>
-          <button class="btn primary-btn">Purchase Asset</button>
+          <button class="btn primary-btn purchase-btn">Purchase Asset</button>
         `;
         assetsGrid.appendChild(card);
       });
-    }, 1500); // 1.5 second delay to show the loading message
+    } catch (error) {
+      loadingMessage.textContent = 'Failed to load assets. Please try again later.';
+      console.error('Failed to fetch marketplace assets:', error);
+    }
   };
 
   // Function to render the global leaderboard
@@ -520,61 +603,69 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Function to populate dashboard with mock data
-  const renderDashboardData = () => {
-    // Mock data that would come from a backend API
-    // const userData = {
-    //   username: 'Poriya',
-    //   netWorth: 1250000,
-    //   netWorthChange: 50000,
-    //   rfcBalance: 75000,
-    //   assetsOwned: 3,
-    //   globalRank: 4821,
-    //   globalRankChange: -125,
-    //   ownedAssets: [
-    //     { name: 'Downtown Office Block', price: 500000, icon: '🏢', description: 'A prime piece of commercial real estate generating steady passive income.' },
-    //     { name: 'Luxury Sports Car', price: 250000, icon: '🚗', description: 'A high-performance vehicle that increases your influence and status.' },
-    //     { name: 'Suburban Residence', price: 180000, icon: '🏠', description: 'A comfortable home that provides a stable base for your empire.' }
-    //   ]
-    // };
+  const renderDashboardData = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      // If no token, redirect to login page
+      window.location.href = 'login.html';
+      return;
+    }
 
-    // The code below would be used to populate the DOM once `userData` is fetched from the backend.
-    // For now, it's commented out to ensure the page loads empty.
+    try {
+      const response = await fetch('http://localhost:5001/api/users/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-    // if (userData) {
-    //   // Populate KPIs
-    //   document.getElementById('username-placeholder').textContent = userData.username;
-    //   document.getElementById('kpi-net-worth').textContent = `RFC ${userData.netWorth.toLocaleString()}`;
-    //   document.getElementById('kpi-net-worth-change').textContent = `+RFC ${userData.netWorthChange.toLocaleString()} (7d)`;
-    //   document.getElementById('kpi-net-worth-change').classList.add('positive');
-    //   document.getElementById('kpi-rfc-balance').textContent = `RFC ${userData.rfcBalance.toLocaleString()}`;
-    //   document.getElementById('kpi-assets-owned').textContent = userData.assetsOwned;
-    //   document.getElementById('kpi-global-rank').textContent = `#${userData.globalRank.toLocaleString()}`;
-    //   document.getElementById('kpi-global-rank-change').textContent = `${userData.globalRankChange.toLocaleString()} (24h)`;
-    //   document.getElementById('kpi-global-rank-change').classList.add('negative');
+      if (!response.ok) {
+        // If token is invalid, remove it and redirect
+        localStorage.removeItem('authToken');
+        window.location.href = 'login.html';
+        return;
+      }
 
-    //   // Populate Owned Assets
-    //   const ownedAssetsGrid = document.querySelector('.owned-assets-grid');
-    //   userData.ownedAssets.forEach(asset => {
-    //     const card = document.createElement('div');
-    //     card.className = 'asset-card owned-asset';
-    //     card.dataset.name = asset.name;
-    //     card.dataset.price = `RFC ${asset.price.toLocaleString()}`;
-    //     card.dataset.icon = asset.icon;
-    //     card.dataset.description = asset.description;
-    //     card.innerHTML = `
-    //       <div class="asset-icon">${asset.icon}</div>
-    //       <div class="asset-info">
-    //         <h3>${asset.name}</h3>
-    //         <p class="asset-price">Value: RFC ${asset.price.toLocaleString()}</p>
-    //       </div>
-    //       <button class="btn more-btn">More</button>
-    //     `;
-    //     ownedAssetsGrid.appendChild(card);
-    //   });
-    // }
+      const userData = await response.json();
 
-    // Re-initialize event listeners for the newly created "More" buttons
-    initializeAssetModalLogic();
+      // Populate KPIs
+      document.getElementById('username-placeholder').textContent = userData.username;
+      document.getElementById('kpi-net-worth').textContent = `RFC ${userData.netWorth.toLocaleString()}`;
+      document.getElementById('kpi-rfc-balance').textContent = `RFC ${userData.rfcBalance.toLocaleString()}`;
+      
+      // Populate Owned Assets
+      const ownedAssetsGrid = document.querySelector('.owned-assets-grid');
+      ownedAssetsGrid.innerHTML = ''; // Clear any existing content
+
+      if (userData.ownedAssets && userData.ownedAssets.length > 0) {
+        document.getElementById('kpi-assets-owned').textContent = userData.ownedAssets.length;
+
+        userData.ownedAssets.forEach(asset => {
+          const card = document.createElement('div');
+          card.className = 'asset-card owned-asset';
+          card.dataset.id = asset._id; // Use asset ID for reliability
+          card.dataset.name = asset.name;
+          card.dataset.price = asset.price;
+          card.dataset.icon = asset.emoji;
+          card.dataset.description = asset.description;
+          card.innerHTML = `
+            <div class="asset-icon">${asset.emoji}</div>
+            <div class="asset-info">
+              <h3>${asset.name}</h3>
+              <p class="asset-price">Value: RFC ${asset.price.toLocaleString()}</p>
+            </div>
+            <button class="btn more-btn">More</button>
+          `;
+          ownedAssetsGrid.appendChild(card);
+        });
+      }
+
+      checkOwnedAssets();
+
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+      // Optionally show an error message to the user
+    }
   };
 
   // --- Initialize Page-Specific Logic ---
@@ -588,6 +679,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // Run logic for the dashboard page
   if (document.querySelector('.dashboard-container')) {
     renderDashboardData();
-    checkOwnedAssets();
   }
 });
