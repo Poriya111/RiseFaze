@@ -48,6 +48,46 @@ const assets = [
     price: 750000,
     emoji: '⚡️',
   },
+  {
+    name: 'Small Storage',
+    category: 'Real Estate',
+    description:
+      'A compact self-storage unit, providing a small but steady stream of passive income from local renters.',
+    price: 7000,
+    emoji: '🏠',
+  },
+  {
+    name: 'Mini Car',
+    category: 'Vehicles',
+    description:
+      'An efficient and nimble city car, perfect for quick errands and navigating urban environments. A practical first vehicle.',
+    price: 5000,
+    emoji: '🚗',
+  },
+  {
+    name: 'Vending Machine',
+    category: 'Business',
+    description:
+      'A single vending machine placed in a high-traffic area, offering a reliable, small-scale cash flow.',
+    price: 6000,
+    emoji: '🍫',
+  },
+  {
+    name: 'Personal Blog',
+    category: 'Digital',
+    description:
+      'A niche blog that generates a small amount of ad revenue. A good entry into digital media.',
+    price: 3500,
+    emoji: '✍️',
+  },
+  {
+    name: 'Stock Photo Portfolio',
+    category: 'Digital',
+    description:
+      'A small collection of licensed stock photos that generate royalties over time.',
+    price: 4500,
+    emoji: '📸',
+  },
 ];
 
 const importData = async () => {

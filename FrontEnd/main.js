@@ -2,7 +2,6 @@
 document.addEventListener('DOMContentLoaded', () => {
   // --- Global UI setup based on login state ---
   const checkLoginState = () => {
-    // In a real app, you'd check for a valid auth token
     const isLoggedIn = localStorage.getItem('authToken');
 
     const loginBtn = document.getElementById('loginBtn');
@@ -120,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (signupForm) {
     signupForm.addEventListener('submit', async function (e) {
       e.preventDefault();
-      const name = this.fullname.value.trim();
+      const name = this.username.value.trim(); // Correctly use the username field
       const email = this.email.value.trim();
       const pw = this.password.value;
       const confirm = this.confirm.value;
@@ -257,6 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const icon = card.dataset.icon;
         const description = card.dataset.description;
  
+        assetModal.dataset.assetId = card.dataset.id; // Store the asset ID on the modal
         // Populate modal
         assetModal.querySelector('#modalAssetName').textContent = name;
         assetModal.querySelector('#modalAssetPrice').textContent = `RFC ${parseInt(price).toLocaleString()}`;
@@ -276,16 +276,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // Add logic for the "Sell to Bank" button
     const sellAssetBtn = document.getElementById('sellAssetBtn');
     if (sellAssetBtn) {
-      sellAssetBtn.addEventListener('click', () => {
-        const assetName = assetModal.querySelector('#modalAssetName').textContent;
-        // Find the corresponding asset card on the dashboard and remove it
-        const assetCardToRemove = document.querySelector(`.asset-card[data-name="${assetName}"]`);
-        if (assetCardToRemove) {
-          assetCardToRemove.remove();
+      sellAssetBtn.addEventListener('click', async () => {
+        const assetId = assetModal.dataset.assetId;
+        const token = localStorage.getItem('authToken');
+
+        if (!assetId || !token) {
+          alert('Could not process sale. Please try again.');
+          return;
         }
-        closeModal();
-        alert(`'${assetName}' sold to the RiseFaze Bank! Your RFC balance has been updated.`);
-        checkOwnedAssets(); // Re-check if the owned assets grid is now empty
+
+        try {
+          const response = await fetch(`http://localhost:5001/api/assets/${assetId}/sell`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.message || 'Sell failed');
+          }
+
+          alert('Asset sold successfully!');
+          closeModal();
+          // Re-render the entire dashboard to reflect all changes (balance, net worth, assets)
+          renderDashboardData();
+
+        } catch (error) {
+          alert(`Error: ${error.message}`);
+        }
       });
     }
   }
@@ -506,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Dynamic Data Population for Explore Page ---
 
   // Function to render assets in the marketplace
-  const renderMarketplaceAssets = async () => {
+  const renderMarketplaceAssets = async (userBalance = -1) => {
     const assetsGrid = document.querySelector('.assets-grid');
     const loadingMessage = document.getElementById('assets-loading');
     if (!assetsGrid || !loadingMessage) return;
@@ -526,6 +547,10 @@ document.addEventListener('DOMContentLoaded', () => {
       bankAssets.forEach(asset => {
         const card = document.createElement('div');
         card.className = 'asset-card';
+
+        // Check if the user can afford the asset
+        const canAfford = userBalance >= asset.price;
+
         // Add a data attribute for the asset ID for future use (e.g., buying)
         card.dataset.id = asset._id;
         card.innerHTML = `
@@ -536,7 +561,9 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <p class="asset-source">Sold by RiseFaze Assets Bank</p>
           <p class="asset-description">${asset.description}</p>
-          <button class="btn primary-btn purchase-btn">Purchase Asset</button>
+          <button class="btn primary-btn purchase-btn" data-id="${asset._id}" ${!canAfford ? 'disabled' : ''} style="${!canAfford ? 'opacity: 0.5; cursor: not-allowed;' : ''}" title="${!canAfford ? 'Insufficient RFC balance' : 'Click to purchase'}">
+            ${canAfford ? 'Purchase Asset' : "Not Enough RFC's"}
+          </button>
         `;
         assetsGrid.appendChild(card);
       });
@@ -672,9 +699,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Run logic for the explore page
   if (document.querySelector('.assets-container')) {
-    renderMarketplaceAssets();
-    renderLeaderboard();
+    const initializeExplorePage = async () => {
+      const token = localStorage.getItem('authToken');
+      let userBalance = -1; // Default for guests
+
+      if (token) {
+        try {
+          const userResponse = await fetch('http://localhost:5001/api/users/me', {
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+          if (userResponse.ok) {
+            const userData = await userResponse.json();
+            userBalance = userData.rfcBalance;
+          }
+        } catch (error) { console.error('Could not fetch user balance for explore page.'); }
+      }
+      renderMarketplaceAssets(userBalance);
+      renderLeaderboard();
+    };
+    initializeExplorePage();
   }
+
+  // Add Purchase Logic using Event Delegation
+  document.addEventListener('click', async (e) => {
+    if (e.target && e.target.classList.contains('purchase-btn')) {
+      const assetId = e.target.dataset.id;
+      const token = localStorage.getItem('authToken');
+
+      if (!token) {
+        alert('You must be logged in to purchase assets.');
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:5001/api/assets/${assetId}/buy`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || 'Purchase failed');
+        }
+
+        alert(`Successfully purchased: ${data.name}!`);
+        e.target.closest('.asset-card').remove(); // Remove the card from the explore page
+      } catch (error) {
+        alert(`Error: ${error.message}`);
+      }
+    }
+  });
 
   // Run logic for the dashboard page
   if (document.querySelector('.dashboard-container')) {
