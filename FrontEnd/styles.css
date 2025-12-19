@@ -173,6 +173,18 @@ header nav a:hover::after {
   box-shadow: 0 12px 48px rgba(95, 150, 212, 0.5);
 }
 
+/* Style for disabled purchase buttons to make them look inactive */
+.btn.purchase-btn:disabled {
+  background: transparent;
+  border: 2px solid var(--accent-light);
+  color: var(--text-color);
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none; /* Prevent hover effects */
+}
+
+
 .secondary-btn {
   background: transparent;
   color: #4b6cb7;
@@ -1069,10 +1081,6 @@ footer a:hover::after {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  max-height: 500px; /* Control the max height before scrolling */
-  overflow-y: auto; /* Enable vertical scrolling when needed */
-  padding-right: 10px; /* Add some space for the scrollbar */
 }
 
 /* Custom Scrollbar for Webkit browsers (Chrome, Safari) */
@@ -1084,13 +1092,7 @@ footer a:hover::after {
   background: transparent; /* Make track invisible */
 }
 
-.leaderboard-list::-webkit-scrollbar-thumb {
-  background-color: var(--accent);
-  border-radius: 10px;
-}
-.leaderboard-list::-webkit-scrollbar-thumb:hover {
-  background-color: #5f96d4;
-}
+
 
 .leaderboard-item {
   display: flex;
@@ -1100,6 +1102,17 @@ footer a:hover::after {
   border-radius: 12px;
   transition: background 0.3s ease;
 }
+
+/* Style for the currently logged-in user on the leaderboard */
+.leaderboard-item.current-user {
+  border: 1px solid var(--accent);
+
+}
+
+.leaderboard-item.current-user .user-name {
+  color: var(--accent)
+}
+
 
 .leaderboard-item .rank {
   font-size: 20px;
@@ -1381,6 +1394,28 @@ footer a:hover::after {
   margin-top: 30px;
 }
 
+/* New styles for input fields inside modals */
+.modal-input {
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--accent-light);
+  background: var(--bg-color);
+  color: var(--text-color);
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.modal-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
 /* Profile Dropdown Popup */
 .profile-menu-container {
   position: relative;
@@ -1512,51 +1547,6 @@ body.popup-open {
   transform: rotate(45deg);
 }
 
-/* Contribution Graph Styles */
-.contribution-graph-container {
-  /* grid-column: 1 / -1; */
-  /* width: 90%; */
-  width: fit-content;
-  margin: 0px auto;
-}
-
-.contribution-graph {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.graph-months {
-  display: flex;
-  justify-content: space-around;
-  font-size: 12px;
-  opacity: 0.7;
-  padding-left: 30px; /* Align with squares */
-}
-.graph-body {
-  display: flex;
-  gap: 10px;
-}
-.graph-days {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-size: 12px;
-  opacity: 0.7;
-}
-.graph-squares {
-  display: grid;
-  grid-template-columns: repeat(52, 1fr); /* 52 weeks */
-  grid-template-rows: repeat(7, 1fr); /* 7 days */
-  grid-auto-flow: column;
-  gap: 4px;
-}
-.graph-square {
-  width: 12px;
-  height: 12px;
-  background-color: #ebedf0; /* Default color */
-  border-radius: 2px;
-}
-
 /* Performance Graph Styles */
 .performance-graph-container {
   width: 100%;
@@ -1602,4 +1592,181 @@ body.popup-open {
 }
 body.dark-mode .chart-toggle-btn.active, body.dark-mode .time-toggle-btn.active {
   background: #1a1a1a;
+}
+
+/* --- Notification Styles --- */
+#notification-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 2000;
+}
+
+.notification {
+  padding: 15px 25px;
+  border-radius: 12px;
+  color: #fff;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  opacity: 0;
+  transform: translateX(100%);
+  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+  min-width: 250px;
+  text-align: center;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.notification.hide {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: all 0.5s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+}
+
+.notification.success {
+  background: linear-gradient(135deg, #28a745, #218838);
+}
+
+.notification.error {
+  background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.notification.info {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+}
+
+/* Add a checkmark or icon for success */
+.notification.success::before {
+  content: '✓ ';
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+/* --- Purchase Animation --- */
+@keyframes flyAway {
+  to {
+    transform: translateY(-80px) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.asset-card.purchased {
+  /* The 'forwards' keyword ensures the element stays in its final state */
+  animation: flyAway 0.6s cubic-bezier(0.55, 0.09, 0.68, 0.53) forwards;
+  /* Make sure the card doesn't affect layout during animation */
+  transform-origin: center bottom;
+}
+
+/* --- News Page Styles --- */
+.news-container {
+  padding: 40px 20px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.news-articles-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  margin-top: 40px;
+}
+
+.news-article-card {
+  width: 100%;
+  padding: 40px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.news-article-header {
+  border-bottom: 1px solid var(--accent-light);
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+.news-article-header h2 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.news-article-date {
+  margin: 5px 0 0 0;
+  font-weight: 600;
+  opacity: 0.7;
+}
+
+.news-article-content p {
+  line-height: 1.7;
+  font-size: 16px;
+  margin-bottom: 1.2em;
+}
+/* --- Animation for Purchased Assets --- */
+
+/* This defines the animation itself */
+@keyframes fadeOutAndShrink {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    /* Use max-height for smoother animation than height */
+    max-height: 250px; /* Adjust if your cards are taller */
+    margin-top: 0;
+    margin-bottom: 20px; /* Assuming this is your default margin */
+    padding: 20px; /* Assuming this is your default padding */
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+    max-height: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+  }
+}
+
+/* This applies the animation when the .purchased class is added */
+.asset-card.purchased {
+  animation: fadeOutAndShrink 0.5s ease-out forwards;
+  /* Ensure the element doesn't disrupt layout during animation */
+  overflow: hidden;
+}
+
+/* Sticky Balance Display on Explore Page */
+.sticky-balance-container {
+  position: sticky;
+  top: 80px; /* Position it below the header (header is ~70px tall) */
+  z-index: 99; /* Below header (100) but above content */
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  pointer-events: none; /* Allows clicking through the container */
+}
+
+.balance-display {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 15px 25px;
+  width: auto;
+  max-width: 400px;
+  pointer-events: auto; /* Re-enable events for the card itself */
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 50px var(--accent);
+}
+
+.balance-label {
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.balance-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
 }

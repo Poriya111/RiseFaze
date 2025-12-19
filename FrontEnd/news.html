@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="media/favicon.png"/>
+  <title>RiseFaze — News</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-mode">
+
+<!-- Header -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <img src="media/logo.png" alt="RiseFaze logo" class="logo-img">
+    RiseFaze
+  </a>
+  <nav>
+    <a href="dashboard.html" class="nav-link" id="dashboardNavBtn">Dashboard</a>
+    <a href="explore.html" class="nav-link">Explore</a>
+    <a href="help.html" class="nav-link">Help</a>
+    <a href="news.html" class="nav-link active">News</a>
+    <div class="profile-menu-container">
+      <button class="btn icon-btn" id="profileBtn" title="Profile & Settings">🙍‍♂️</button>
+      <div class="feature-card profile-popup" id="profilePopup">
+        <a href="#" class="text-btn" id="logoutBtn">Logout</a>
+      </div>
+    </div>
+    <button class="btn mode-toggle" id="modeToggle">🌙</button>
+  </nav>
+</header>
+
+<!-- Main Content: News -->
+<main class="news-container lazy-load">
+  <div class="dashboard-header">
+    <h1>Latest News & Updates</h1>
+    <p>Stay up to date with everything happening in the world of RiseFaze.</p>
+  </div>
+
+  <div class="news-articles-grid">
+    <!-- Example News Article -->
+    <article class="feature-card news-article-card">
+      <div class="news-article-header">
+        <h2>Welcome to RiseFaze V1!</h2>
+        <p class="news-article-date">December 17, 2025</p>
+      </div>
+<div class="news-article-content">
+  <p>
+    I’m officially launching RiseFaze Version 1. This is the first public milestone of a project I’ve been building from the ground up. The core economy is now live, assets are actively generating income, and the leaderboard is tracking top performers in real time.
+  </p>
+  <p>
+    This is only the foundation. I’m already developing new asset categories, deeper economic mechanics, and community-driven systems that will expand RiseFaze far beyond its initial scope. Thank you to everyone who joined early and helped validate the vision.
+  </p>
+  <p><em>— Founder & Developer, RiseFaze</em></p>
+</div>
+
+    </article>
+
+    <!-- Add your next news article here -->
+    <!-- 
+    <article class="feature-card news-article-card">
+      <div class="news-article-header">
+        <h2>Upcoming Feature: Player-to-Player Trading</h2>
+        <p class="news-article-date">December 10, 2025</p>
+      </div>
+      <div class="news-article-content">
+        <p>Get ready for a whole new level of strategy! We are in the final stages of developing a secure player-to-player marketplace...</p>
+      </div>
+    </article>
+    -->
+  </div>
+</main>
+
+<script src="main.js"></script>
+</body>
+</html>

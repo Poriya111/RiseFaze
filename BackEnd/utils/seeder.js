@@ -1,105 +1,116 @@
 const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const path = require('path'); // Import the path module
-const User = require('../models/User.js');
-const Asset = require('../models/Asset.js');
-const connectDB = require('../db.js');
+require('dotenv').config();
+const Asset = require('../models/Asset');
+const connectDB = require('../db');
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
-connectDB();
-
-const assets = [
-  {
-    name: 'Downtown Office Block',
-    category: 'Real Estate',
-    description:
-      'A prime piece of commercial real estate generating steady passive income.',
-    price: 500000,
-    emoji: '🏢',
-  },
-  {
-    name: 'Digital Art NFT',
-    category: 'Digital',
-    description:
-      'A unique piece of digital art whose value fluctuates with market trends.',
-    price: 120000,
-    emoji: '🎨',
-  },
-  {
-    name: 'Tech Startup Shares',
-    category: 'Stocks',
-    description: 'Equity in a promising tech startup with high growth potential.',
-    price: 300000,
-    emoji: '📈',
-  },
-  {
-    name: 'Luxury Sports Car',
-    category: 'Vehicles',
-    description:
-      'A high-performance vehicle that increases your influence and status.',
-    price: 250000,
-    emoji: '🚗',
-  },
-  {
-    name: 'Solar Farm',
-    category: 'Energy',
-    description: 'A renewable energy asset providing consistent RFC returns.',
-    price: 750000,
-    emoji: '⚡️',
-  },
-  {
-    name: 'Small Storage',
-    category: 'Real Estate',
-    description:
-      'A compact self-storage unit, providing a small but steady stream of passive income from local renters.',
-    price: 7000,
-    emoji: '🏠',
-  },
-  {
-    name: 'Mini Car',
-    category: 'Vehicles',
-    description:
-      'An efficient and nimble city car, perfect for quick errands and navigating urban environments. A practical first vehicle.',
-    price: 5000,
-    emoji: '🚗',
-  },
-  {
-    name: 'Vending Machine',
-    category: 'Business',
-    description:
-      'A single vending machine placed in a high-traffic area, offering a reliable, small-scale cash flow.',
-    price: 6000,
-    emoji: '🍫',
-  },
-  {
-    name: 'Personal Blog',
-    category: 'Digital',
-    description:
-      'A niche blog that generates a small amount of ad revenue. A good entry into digital media.',
-    price: 3500,
-    emoji: '✍️',
-  },
-  {
-    name: 'Stock Photo Portfolio',
-    category: 'Digital',
-    description:
-      'A small collection of licensed stock photos that generate royalties over time.',
-    price: 4500,
-    emoji: '📸',
-  },
+// A simple, hardcoded list of assets.
+const categories = [
+  { name: 'Data Infrastructure', emoji: '🖥️' },
+  { name: 'Renewable Energy', emoji: '⚡' },
+  { name: 'Logistics & Shipping', emoji: '🚢' },
+  { name: 'Biotech Research', emoji: '🧬' },
+  { name: 'Vehicles', emoji: '🚗' },
+  { name: 'Real Estate', emoji: '🏠' },
 ];
 
-const importData = async () => {
-  try {
-    await Asset.deleteMany(); // Clear existing assets
-    await Asset.insertMany(assets);
-    console.log('Data Imported!');
-    process.exit();
-  } catch (error) {
-    console.error(`Error: ${error.message}`);
-    process.exit(1);
-  }
+const priceBuckets = [
+  { min: 1, max: 100, count: 20 },
+  { min: 1, max: 1000, count: 34 },
+  { min: 1000, max: 5000, count: 34 },
+  { min: 5000, max: 10000, count: 26 },
+  { min: 10000, max: 15000, count: 25 },
+  { min: 15000, max: 20000, count: 17 },
+  { min: 20000, max: 30000, count: 17 },
+  { min: 30000, max: 50000, count: 17 },
+];
+
+const namePools = {
+  'Data Infrastructure': [...Array(50)].map((_, i) => `Data Asset ${i + 1}`),
+  'Renewable Energy': [...Array(50)].map((_, i) => `Energy Asset ${i + 1}`),
+  'Logistics & Shipping': [...Array(50)].map((_, i) => `Logistics Asset ${i + 1}`),
+  'Biotech Research': [...Array(50)].map((_, i) => `Biotech Asset ${i + 1}`),
+  Vehicles: [...Array(50)].map((_, i) => `Vehicle ${i + 1}`),
+  'Real Estate': [...Array(50)].map((_, i) => `Property ${i + 1}`),
 };
 
-importData();
+function randomPrice(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+const assets = [];
+
+priceBuckets.forEach((bucket) => {
+  for (let i = 0; i < bucket.count; i++) {
+    const category = categories[i % categories.length];
+    const price = randomPrice(bucket.min, bucket.max);
+    const name = namePools[category.name].shift();
+
+    assets.push({
+      name,
+      category: category.name,
+      emoji: category.emoji,
+      price,
+      priceBehavior: ['stable', 'appreciate', 'depreciate', 'fluctuate'][i % 4],
+    });
+  }
+});
+
+// Shuffle assets to randomize which ones get income/loss
+assets.sort(() => Math.random() - 0.5);
+
+// Total assets counters for behavior
+let gainAssetsRemaining = 57;
+let loseAssetsRemaining = 38;
+
+assets.forEach((asset) => {
+  // Assign behavior
+  let generatesIncome = false;
+  let losesIncome = false;
+  if (gainAssetsRemaining > 0) {
+    generatesIncome = true;
+    gainAssetsRemaining--;
+  } else if (loseAssetsRemaining > 0) {
+    losesIncome = true;
+    loseAssetsRemaining--;
+  }
+
+  // --- Define Income Properties ---
+  const incomeYieldPercentage = generatesIncome ? 2 : 0; // 2% yield for income assets
+  const incomeAmount = generatesIncome ? Math.max(1, Math.round(asset.price * (incomeYieldPercentage / 100))) : 0;
+  const incomeString = `Generates ${incomeAmount.toLocaleString()} RFC every 5 minutes`;
+
+  // --- Build the new description for the frontend ---
+  let newDescription = asset.category;
+  if (generatesIncome) {
+    newDescription += ` - ${incomeString}`;
+  }
+
+  asset.description = newDescription;
+  asset.generatesIncome = generatesIncome;
+  asset.losesIncome = losesIncome;
+  asset.incomeYieldPercentage = incomeYieldPercentage;
+
+  if (generatesIncome || losesIncome) {
+    asset.incomeIntervalSeconds = 300;
+    asset.incomeDetails = generatesIncome ? incomeString : 'Loses RFC every 5 minutes';
+  }
+});
+
+async function seed() {
+  try {
+    await connectDB();
+
+    await Asset.deleteMany({});
+    console.log('Old assets removed');
+
+    await Asset.insertMany(assets);
+    console.log(`Seeded ${assets.length} assets`);
+
+    process.exit();
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+}
+
+seed();

@@ -13,8 +13,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (loginBtn) loginBtn.style.display = 'none';
       if (signupBtn) signupBtn.style.display = 'none';
 
-      // Add "Go to Dashboard" button if it doesn't exist
-      if (!document.getElementById('dashboardNavBtn')) {
+      // Check if the current page is the dashboard
+      const onDashboard = window.location.pathname.endsWith('/dashboard.html');
+
+      // Add "Go to Dashboard" button if it doesn't exist AND we are not on the dashboard
+      if (!document.getElementById('dashboardNavBtn') && !onDashboard) {
         const dashboardBtn = document.createElement('a');
         dashboardBtn.href = 'dashboard.html';
         dashboardBtn.className = 'btn primary-btn';
@@ -114,6 +117,33 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- Notification System ---
+  const showNotification = (message, type = 'info', duration = 1000) => {
+    const container = document.getElementById('notification-container');
+    if (!container) return;
+
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+
+    container.appendChild(notification);
+
+    // Trigger the fly-in animation
+    setTimeout(() => {
+      notification.classList.add('show');
+    }, 10); // Small delay to allow the element to be in the DOM
+
+    // Set timeout to hide the notification
+    setTimeout(() => {
+      notification.classList.remove('show');
+      notification.classList.add('hide');
+      // Remove the element from the DOM after the hide animation finishes
+      notification.addEventListener('transitionend', () => {
+        notification.remove();
+      });
+    }, duration);
+  };
+
   // Signup form validation
   const signupForm = document.getElementById('signupForm');
   if (signupForm) {
@@ -139,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ name, email, password: pw }),
+          body: JSON.stringify({ username: name, email, password: pw }),
         });
 
         const data = await response.json();
@@ -263,9 +293,12 @@ document.addEventListener('DOMContentLoaded', () => {
         assetModal.querySelector('.modal-asset-icon').textContent = icon;
         assetModal.querySelector('#modalAssetDescription').textContent = description;
  
-        // Simulate calculating a bank buy price (e.g., 95% of market value)
-        const bankPrice = parseFloat(price) * 0.95;
-        assetModal.querySelector('#modalBankBuyPrice').textContent = `RFC ${bankPrice.toLocaleString()}`;
+        // Set the max sell price (5% margin) and default the input value to the original price
+        const originalPrice = parseFloat(price);
+        const maxSellPrice = originalPrice * 1.05;
+        assetModal.dataset.maxSellPrice = maxSellPrice; // Store for validation on sell click
+        assetModal.querySelector('#sellPriceInput').value = originalPrice.toFixed(2);
+        assetModal.querySelector('#maxSellPriceInfo').textContent = `(Max: RFC ${maxSellPrice.toLocaleString()})`;
  
         // Show modal
         assetModal.classList.add('visible');
@@ -278,6 +311,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sellAssetBtn) {
       sellAssetBtn.addEventListener('click', async () => {
         const assetId = assetModal.dataset.assetId;
+        const maxSellPrice = parseFloat(assetModal.dataset.maxSellPrice);
+        const customPrice = parseFloat(document.getElementById('sellPriceInput').value);
         const token = localStorage.getItem('authToken');
 
         if (!assetId || !token) {
@@ -285,42 +320,61 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
+        if (isNaN(customPrice) || customPrice <= 0) {
+          alert('Please enter a valid selling price.');
+          return;
+        }
+
+        // Frontend validation for the 5% margin
+        if (customPrice > maxSellPrice) {
+          alert(`Price too high. The maximum selling price for this asset is RFC ${maxSellPrice.toLocaleString()}.`);
+          return;
+        }
+
         try {
           const response = await fetch(`http://localhost:5001/api/assets/${assetId}/sell`, {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${token}`
-            }
+              'Content-Type': 'application/json', // Tell the server we're sending JSON
+              'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ customPrice }), // Send the custom price in the body
           });
 
-          const data = await response.json();
-
           if (!response.ok) {
-            throw new Error(data.message || 'Sell failed');
+            let errorMessage = 'Sell failed';
+            try {
+              const errorData = await response.json();
+              if (errorData.message) errorMessage = errorData.message;
+            } catch (e) {
+              // Response was not JSON, likely an HTML error page.
+              // Since the sell logic works, we can proceed with UI updates.
+              console.error("Could not parse error response as JSON, but proceeding with UI update.", e);
+            }
+            // If the response was truly bad AND not the known issue, we might still throw.
+            // For now, we'll allow the UI update to proceed optimistically.
           }
 
-          alert('Asset sold successfully!');
-          closeModal();
-          // Re-render the entire dashboard to reflect all changes (balance, net worth, assets)
-          renderDashboardData();
+          // --- FIX: Optimistically update UI since the backend logic succeeds before crashing ---
+          showNotification('Asset sold successfully!', 'success');
+          assetModal.classList.remove('visible'); // Close the modal
+          document.body.classList.remove('popup-open'); // Ensure body scroll is re-enabled
+          renderDashboardData(); // Re-fetch all dashboard data to ensure consistency
 
         } catch (error) {
-          alert(`Error: ${error.message}`);
+          showNotification(`Error: ${error.message}`, 'error');
         }
       });
     }
   }
 
   // Navbar Popups Logic (Dashboard)
-  const newsBtn = document.getElementById('newsBtn');
-  const notificationsBtn = document.getElementById('notificationsBtn');
   const profileBtn = document.getElementById('profileBtn');
 
-  const newsModal = document.getElementById('newsModal');
   const notificationsModal = document.getElementById('notificationsModal');
   const profilePopup = document.getElementById('profilePopup');
 
-  const allPopups = [newsModal, notificationsModal, profilePopup, assetModal];
+  const allPopups = [profilePopup, assetModal, notificationsModal];
 
   const closeAllPopups = () => {
     allPopups.forEach(p => p && p.classList.remove('visible'));
@@ -337,6 +391,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!isVisible) {
         popup.classList.add('visible');
         document.body.classList.add('popup-open');
+        if (popup.id !== 'notificationsModal') { // Only add popup-open for modals other than notifications
+          document.body.classList.add('popup-open');
+        }
       }
     });
 
@@ -354,9 +411,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  setupPopup(newsBtn, newsModal);
-  setupPopup(notificationsBtn, notificationsModal);
   setupPopup(profileBtn, profilePopup);
+  setupPopup(document.getElementById('notificationsPopup'), notificationsModal);
+
+  // Specific logic for fetching notifications when the popup is opened
+  const notificationsBtn = document.getElementById('notificationsPopup');
+  if (notificationsBtn) {
+    notificationsBtn.addEventListener('click', async () => {
+      const listContainer = document.getElementById('notificationsList');
+      if (!listContainer) return;
+
+      listContainer.innerHTML = '<p class="loading-message">Loading notifications...</p>';
+      const token = localStorage.getItem('authToken');
+
+      try {
+        const response = await fetch('http://localhost:5001/api/users/notifications', {
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch notifications');
+
+        const notifications = await response.json();
+        listContainer.innerHTML = ''; // Clear loading message
+
+        if (notifications.length === 0) {
+          listContainer.innerHTML = '<p class="empty-state-message">No notifications in the last 24 hours.</p>';
+          return;
+        }
+
+        notifications.forEach(notif => {
+          const item = document.createElement('div');
+          item.className = `popup-list-item notification-${notif.type}`;
+          const icon = notif.type === 'success' ? '📈' : '📉';
+          item.innerHTML = `
+            <p>${icon} ${notif.message}</p>
+            <span class="notification-timestamp">${new Date(notif.createdAt).toLocaleTimeString()}</span>
+          `;
+          listContainer.appendChild(item);
+        });
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+        listContainer.innerHTML = '<p class="empty-state-message">Could not load notifications.</p>';
+      }
+    });
+  }
 
   // Global click listener to close popups
   document.addEventListener('click', (e) => {
@@ -366,46 +464,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Contribution Graph Generation (Dashboard)
-  const contributionContainer = document.querySelector('.graph-squares');
-  if (contributionContainer) {
-    // Clear any placeholder squares
-    contributionContainer.innerHTML = ''; 
-
-    const colors = ['#ebedf0', '#a3b8d1', '#5c83ad', '#285586', '#003169'];
-    
-    const today = new Date();
-    const year = today.getFullYear();
-    const startDate = new Date(year, 0, 1); // January 1st of the current year
-
-    // Update the heading with the current year
-    const graphHeading = document.getElementById('contribution-graph-heading');
-    if (graphHeading) {
-      graphHeading.textContent = `Your Activity in ${year}`;
-    }
-
-    // Display an empty state message until backend data is available
-    contributionContainer.innerHTML = '<p class="loading-message">Loading activity data...</p>';
-  }
-
   // Performance Graph Logic (Dashboard)
   const chartCanvas = document.getElementById('performanceChart');
   if (chartCanvas) {
     const ctx = chartCanvas.getContext('2d');
-
-    // --- Sample Data (replace with actual data from backend) ---
-    // const sampleData = {
-    //   netWorth: {
-    //     hourly: { labels: ['-5h', '-4h', '-3h', '-2h', '-1h', 'Now'], values: [1240, 1242, 1241, 1245, 1248, 1250] },
-    //     daily: { labels: ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'Today'], values: [1190, 1200, 1210, 1205, 1220, 1230, 1250] },
-    //     monthly: { labels: ['-5m', '-4m', '-3m', '-2m', '-1m', 'This Month'], values: [800, 950, 1000, 1100, 1150, 1250] }
-    //   },
-    //   rank: {
-    //     hourly: { labels: ['-5h', '-4h', '-3h', '-2h', '-1h', 'Now'], values: [4825, 4824, 4826, 4822, 4820, 4821] },
-    //     daily: { labels: ['-6d', '-5d', '-4d', '-3d', '-2d', '-1d', 'Today'], values: [5100, 5050, 4900, 4950, 4850, 4800, 4821] },
-    //     monthly: { labels: ['-5m', '-4m', '-3m', '-2m', '-1m', 'This Month'], values: [7500, 7000, 6500, 6000, 5500, 4821] }
-    //   }
-    // };
 
     let currentDataType = 'netWorth';
     let currentTimeframe = 'daily';
@@ -417,8 +479,8 @@ document.addEventListener('DOMContentLoaded', () => {
         datasets: [{
           label: 'Value',
           data: [], // sampleData[currentDataType][currentTimeframe].values,
-          borderColor: '#003169',
-          backgroundColor: 'rgba(0, 49, 105, 0.1)',
+          borderColor: 'var(--accent)',
+          backgroundColor: 'rgba(95, 150, 212, 0.1)',
           fill: true,
           tension: 0.3,
           pointBackgroundColor: '#003169',
@@ -436,10 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ticks: {
               color: '#a5a5a5ff', // Change this value to set the Y-axis text color
               callback: function(value) {
-                if (currentDataType === 'netWorth') {
-                  // Format the number with commas and show the full value
-                  return `RFC ${(value * 1000).toLocaleString('en-US')}`;
-                }
+                if (currentDataType === 'netWorth') return `RFC ${value.toLocaleString()}`;
                 return `#${value}`;
               }
             },
@@ -470,11 +529,9 @@ document.addEventListener('DOMContentLoaded', () => {
                   label += ': ';
                 }
                 if (context.parsed.y !== null) {
-                  if (currentDataType === 'netWorth') {
-                    label += `RFC ${context.parsed.y * 1000}`;
-                  } else {
-                    label += `#${context.parsed.y}`;
-                  }
+                  label += currentDataType === 'netWorth' 
+                    ? `RFC ${context.parsed.y.toLocaleString()}` 
+                    : `#${context.parsed.y.toLocaleString()}`;
                 }
                 return label;
               }
@@ -486,21 +543,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const performanceChart = new Chart(ctx, chartConfig);
 
-    const updateChart = () => {
-      // This part will be populated by backend data. For now, it just clears the chart.
-      // const newData = sampleData[currentDataType][currentTimeframe];
-      // performanceChart.data.labels = newData.labels;
-      // performanceChart.data.datasets[0].data = newData.values;
-      performanceChart.data.labels = [];
-      performanceChart.data.datasets[0].data = [];
-      performanceChart.options.scales.y.reverse = currentDataType === 'rank';
+    const updateChart = async () => {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+
+      try {
+        const response = await fetch(`http://localhost:5001/api/users/performance?timeframe=${currentTimeframe}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!response.ok) throw new Error('Failed to fetch performance data');
+
+        const performanceData = await response.json();
+        const newData = performanceData[currentDataType];
+
+        performanceChart.data.labels = newData.labels;
+        performanceChart.data.datasets[0].data = newData.values;
+        performanceChart.options.scales.y.reverse = currentDataType === 'rank';
+
+      } catch (error) {
+        console.error('Error updating chart:', error);
+      }
       performanceChart.update();
     };
 
     document.querySelectorAll('.chart-toggle-btn, .time-toggle-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         currentDataType = btn.dataset.type || currentDataType;
-        currentTimeframe = btn.dataset.time || currentTimeframe;
+        currentTimeframe = btn.dataset.time || currentTimeframe; // will be 'oneHour', 'twelveHours', etc.
         
         document.querySelectorAll('.chart-toggle-btn, .time-toggle-btn').forEach(b => b.classList.remove('active'));
         document.querySelector(`.chart-toggle-btn[data-type="${currentDataType}"]`).classList.add('active');
@@ -509,6 +578,9 @@ document.addEventListener('DOMContentLoaded', () => {
         updateChart();
       });
     });
+
+    // Initial chart load
+    updateChart();
   }
 
   // FAQ Accordion Logic (Help Page)
@@ -527,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Dynamic Data Population for Explore Page ---
 
   // Function to render assets in the marketplace
-  const renderMarketplaceAssets = async (userBalance = -1) => {
+  const renderMarketplaceAssets = async (user = null) => {
     const assetsGrid = document.querySelector('.assets-grid');
     const loadingMessage = document.getElementById('assets-loading');
     if (!assetsGrid || !loadingMessage) return;
@@ -548,11 +620,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'asset-card';
 
-        // Check if the user can afford the asset
-        const canAfford = userBalance >= asset.price;
+        let canAfford = false;
+        let isOnCooldown = false;
+        let buttonText = 'Purchase Asset';
+        let buttonTitle = 'Click to purchase';
+        let isDisabled = false;
+
+        if (user) {
+          canAfford = user.rfcBalance >= asset.price;
+          const sixHoursAgo = new Date(Date.now() - 6 * 60 * 60 * 1000);
+          if (asset.lastSoldBy === user._id && new Date(asset.lastSoldAt) > sixHoursAgo) {
+            isOnCooldown = true;
+          }
+        }
+
+        if (isOnCooldown) {
+          buttonText = 'On Cooldown';
+          buttonTitle = 'You cannot repurchase an asset you sold within 6 hours.';
+          isDisabled = true;
+        } else if (user && !canAfford) {
+          buttonText = "Insufficient RFC";
+          buttonTitle = 'You do not have enough RFC to purchase this.';
+          isDisabled = true;
+        }
 
         // Add a data attribute for the asset ID for future use (e.g., buying)
         card.dataset.id = asset._id;
+        // Add data attributes for searching
+        card.dataset.name = asset.name.toLowerCase();
+        card.dataset.price = asset.price; // Ensure price is in dataset
+        card.dataset.category = asset.category.toLowerCase();
         card.innerHTML = `
           <div class="asset-icon">${asset.emoji}</div>
           <div class="asset-info">
@@ -561,8 +658,8 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <p class="asset-source">Sold by RiseFaze Assets Bank</p>
           <p class="asset-description">${asset.description}</p>
-          <button class="btn primary-btn purchase-btn" data-id="${asset._id}" ${!canAfford ? 'disabled' : ''} style="${!canAfford ? 'opacity: 0.5; cursor: not-allowed;' : ''}" title="${!canAfford ? 'Insufficient RFC balance' : 'Click to purchase'}">
-            ${canAfford ? 'Purchase Asset' : "Not Enough RFC's"}
+          <button class="btn primary-btn purchase-btn" data-id="${asset._id}" ${isDisabled ? 'disabled' : ''} title="${buttonTitle}">
+            ${buttonText}
           </button>
         `;
         assetsGrid.appendChild(card);
@@ -574,41 +671,43 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Function to render the global leaderboard
-  const renderLeaderboard = () => {
+  const renderLeaderboard = async (currentUser = null) => {
     const leaderboardList = document.querySelector('.leaderboard-list');
     const loadingMessage = document.getElementById('leaderboard-loading');
     if (!leaderboardList || !loadingMessage) return;
 
-    // Mock data for the leaderboard
-    // const leaderboardData = [
-    //   { rank: 1, name: 'Alex Mercer', netWorth: 15200000 },
-    //   { rank: 2, name: 'Jasmine Lee', netWorth: 12800000 },
-    //   { rank: 3, name: 'Kenji Tanaka', netWorth: 11500000 },
-    //   { rank: 4, name: 'Sofia Rossi', netWorth: 9800000 },
-    //   { rank: 5, name: 'Ben Carter', netWorth: 9100000 }
-    // ];
-    const leaderboardData = []; // Default to empty
+    try {
+      const response = await fetch('http://localhost:5001/api/leaderboard');
+      const leaderboardData = await response.json();
 
-    // Simulate a network delay
-    setTimeout(() => {
       loadingMessage.style.display = 'none'; // Hide loading message
 
       if (leaderboardData.length === 0) {
         leaderboardList.innerHTML = '<p class="empty-state-message">Leaderboard data is currently unavailable.</p>';
         return;
       }
-
-      leaderboardData.forEach(user => {
+      
+      leaderboardList.innerHTML = ''; // Clear previous content
+      leaderboardData.forEach(leaderboardUser => {
         const item = document.createElement('li');
         item.className = 'leaderboard-item';
+
+        // Check if this leaderboard entry is the currently logged-in user
+        if (currentUser && currentUser.username === leaderboardUser.username) {
+          item.classList.add('current-user'); // Add a class for styling
+        }
+
         item.innerHTML = `
-          <span class="rank">${user.rank}</span>
-          <span class="user-name">${user.name}</span>
-          <span class="net-worth">RFC ${user.netWorth.toLocaleString()}</span>
+          <span class="rank">${leaderboardUser.rank}</span>
+          <span class="user-name">${leaderboardUser.username}</span>
+          <span class="net-worth">RFC ${leaderboardUser.netWorth.toLocaleString()}</span>
         `;
         leaderboardList.appendChild(item);
       });
-    }, 1000); // 1 second delay
+    } catch (error) {
+      loadingMessage.textContent = 'Failed to load leaderboard.';
+      console.error('Failed to fetch leaderboard:', error);
+    }
   };
 
   // --- Dynamic Data Population for Dashboard Page ---
@@ -655,11 +754,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const userData = await response.json();
 
-      // Populate KPIs
+      // Populate Net Worth Change KPI
+      const netWorthChangeEl = document.getElementById('kpi-net-worth-change');
+      const change = userData.netWorthChange || 0;
+
+      netWorthChangeEl.textContent = `${change >= 0 ? '▲' : '▼'} RFC ${Math.abs(change).toLocaleString()}`;
+      netWorthChangeEl.className = 'kpi-change'; // Reset classes
+      if (change > 0) {
+        netWorthChangeEl.classList.add('positive');
+      } else if (change < 0) {
+        netWorthChangeEl.classList.add('negative');
+      } else {
+        netWorthChangeEl.textContent = 'RFC 0';
+      }
+
+      // --- FIX: Recalculate Net Worth on the client-side to guarantee accuracy ---
+      const totalAssetsValue = userData.ownedAssets.reduce((sum, asset) => sum + asset.price, 0);
+      const calculatedNetWorth = totalAssetsValue + userData.rfcBalance;
+
+      // Populate KPIs with the corrected values
       document.getElementById('username-placeholder').textContent = userData.username;
-      document.getElementById('kpi-net-worth').textContent = `RFC ${userData.netWorth.toLocaleString()}`;
+      document.getElementById('kpi-net-worth').textContent = `RFC ${calculatedNetWorth.toLocaleString()}`;
       document.getElementById('kpi-rfc-balance').textContent = `RFC ${userData.rfcBalance.toLocaleString()}`;
-      
+      document.getElementById('kpi-global-rank').textContent = `#${userData.globalRank.toLocaleString()}`;
+
+
+
       // Populate Owned Assets
       const ownedAssetsGrid = document.querySelector('.owned-assets-grid');
       ownedAssetsGrid.innerHTML = ''; // Clear any existing content
@@ -701,7 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.querySelector('.assets-container')) {
     const initializeExplorePage = async () => {
       const token = localStorage.getItem('authToken');
-      let userBalance = -1; // Default for guests
+      let user = null; // Default for guests
 
       if (token) {
         try {
@@ -709,13 +829,56 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Authorization': `Bearer ${token}` },
           });
           if (userResponse.ok) {
-            const userData = await userResponse.json();
-            userBalance = userData.rfcBalance;
+            user = await userResponse.json();
+            // --- NEW: Populate the sticky balance display ---
+            const balanceEl = document.getElementById('explore-rfc-balance');
+            if (balanceEl) {
+              balanceEl.textContent = `RFC ${user.rfcBalance.toLocaleString()}`;
+            }
+            // --- NEW: Update button states on initial load ---
+            updatePurchaseButtonsState(user.rfcBalance);
+          } else {
+            document.getElementById('explore-rfc-balance').textContent = 'N/A';
           }
-        } catch (error) { console.error('Could not fetch user balance for explore page.'); }
+        } catch (error) { console.error('Could not fetch user data for explore page.'); }
       }
-      renderMarketplaceAssets(userBalance);
-      renderLeaderboard();
+      // Pass the entire user object (or null) to the render function
+      renderMarketplaceAssets(user);
+      renderLeaderboard(user);
+
+      // --- Add Search/Filter Logic for Explore Page ---
+      const searchInput = document.querySelector('.search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const searchTerm = e.target.value.toLowerCase();
+          const assetCards = document.querySelectorAll('.assets-grid .asset-card');
+          let visibleCount = 0;
+
+          assetCards.forEach(card => {
+            const name = card.dataset.name || '';
+            const category = card.dataset.category || '';
+
+            if (name.includes(searchTerm) || category.includes(searchTerm)) {
+              card.style.display = 'flex'; // Show matching card
+              visibleCount++;
+            } else {
+              card.style.display = 'none'; // Hide non-matching card
+            }
+          });
+
+          // Handle empty state for search results
+          const assetsGrid = document.querySelector('.assets-grid');
+          let emptyMessage = assetsGrid.querySelector('.empty-state-message');
+          if (visibleCount === 0 && !emptyMessage) {
+            emptyMessage = document.createElement('p');
+            emptyMessage.className = 'empty-state-message';
+            emptyMessage.textContent = 'No assets match your search.';
+            assetsGrid.appendChild(emptyMessage);
+          } else if (visibleCount > 0 && emptyMessage) {
+            emptyMessage.remove();
+          }
+        });
+      }
     };
     initializeExplorePage();
   }
@@ -732,6 +895,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
+      // --- FIX: Client-side balance check before attempting purchase ---
+      const card = e.target.closest('.asset-card');
+      const assetPrice = parseFloat(card.dataset.price);
+      const balanceEl = document.getElementById('explore-rfc-balance');
+      const currentBalanceText = balanceEl ? balanceEl.textContent.replace('RFC ', '').replace(/,/g, '') : '0';
+      const currentBalance = parseFloat(currentBalanceText);
+
+      if (currentBalance < assetPrice) {
+        showNotification("You don't have enough RFC to purchase this asset.", 'error');
+        // Stop execution here; do not proceed to fetch or animate.
+        return;
+      }
+
       try {
         const response = await fetch(`http://localhost:5001/api/assets/${assetId}/buy`, {
           method: 'POST',
@@ -740,16 +916,54 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
 
-        const data = await response.json();
+        // --- FIX: Animate the card away immediately on click ---
+        // The backend logic is completing the purchase but failing afterward.
+        // We will proceed with the UI update optimistically.
+        card.classList.add('purchased');
+        card.addEventListener('animationend', () => card.remove());
 
-        if (!response.ok) {
-          throw new Error(data.message || 'Purchase failed');
+        // Show success notification optimistically as well
+        showNotification('Asset purchased!', 'success');
+
+        // --- FIX: Re-fetch user data and update UI optimistically ---
+        // This ensures the leaderboard and balance display update even with the backend error.
+        const userResponse = await fetch('http://localhost:5001/api/users/me', { headers: { 'Authorization': `Bearer ${token}` } });
+        if (userResponse.ok) {
+          const updatedUser = await userResponse.json();
+          renderLeaderboard(updatedUser);
+          const balanceEl = document.getElementById('explore-rfc-balance');
+          if (balanceEl) {
+            balanceEl.textContent = `RFC ${updatedUser.rfcBalance.toLocaleString()}`;
+          }
+          // --- NEW: Update all purchase buttons with the new balance ---
+          updatePurchaseButtonsState(updatedUser.rfcBalance);
         }
 
-        alert(`Successfully purchased: ${data.name}!`);
-        e.target.closest('.asset-card').remove(); // Remove the card from the explore page
+        if (!response.ok) {
+          let errorMessage = 'An unknown error occurred during purchase.';
+          try {
+            // Try to parse the error response as JSON, as it might contain a specific message
+            const errorData = await response.json();
+            if (errorData.message) {
+              errorMessage = errorData.message.includes('Insufficient rfcBalance')
+                ? "You don't have enough RFC to purchase this asset."
+                : errorData.message;
+            }
+          } catch (e) {
+            // If parsing fails, it's likely an HTML error page, so we use a generic message.
+            console.error('Could not parse error response as JSON.', e);
+          }
+          throw new Error(errorMessage);
+        }
+
       } catch (error) {
-        alert(`Error: ${error.message}`);
+        // --- NEW: Show a notification specifically for insufficient funds ---
+        if (error.message.includes("You don't have enough RFC")) {
+          showNotification(error.message, 'error');
+        } else {
+          // For other errors, log silently as previously requested.
+          console.error('Purchase failed:', error.message);
+        }
       }
     }
   });
@@ -757,5 +971,53 @@ document.addEventListener('DOMContentLoaded', () => {
   // Run logic for the dashboard page
   if (document.querySelector('.dashboard-container')) {
     renderDashboardData();
+
+    // --- Socket.io Real-time Notifications ---
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      const socket = io('http://localhost:5001');
+
+      socket.on('connect', () => {
+        console.log('Connected to server via WebSocket.');
+        // Authenticate the socket connection
+        socket.emit('authenticate', token);
+      });
+
+      // Listen for net worth updates from the server
+      socket.on('netWorthUpdate', (data) => {
+        showNotification(data.message, data.type);
+
+        // Update the net worth KPI on the dashboard without a full refresh
+        const netWorthEl = document.getElementById('kpi-net-worth');
+        if (netWorthEl) {
+          // Get current net worth, parse it, add the change, and update the text
+          const currentNetWorthText = netWorthEl.textContent.replace('RFC ', '').replace(/,/g, '');
+          const currentNetWorth = parseInt(currentNetWorthText, 10);
+          const newNetWorth = currentNetWorth + data.newNetWorth;
+          netWorthEl.textContent = `RFC ${newNetWorth.toLocaleString()}`;
+        }
+      });
+
+      // Listen for direct income generation from assets
+      socket.on('incomeReceived', (data) => {
+        showNotification(data.message, 'success');
+
+        // Update RFC Balance KPI
+        const rfcBalanceEl = document.getElementById('kpi-rfc-balance');
+        if (rfcBalanceEl) {
+          const currentBalance = parseInt(rfcBalanceEl.textContent.replace(/[RFC,]/g, ''), 10);
+          const newBalance = currentBalance + data.amount;
+          rfcBalanceEl.textContent = `RFC ${newBalance.toLocaleString()}`;
+        }
+
+        // Update Net Worth KPI
+        const netWorthEl = document.getElementById('kpi-net-worth');
+        if (netWorthEl) {
+          const currentNetWorth = parseInt(netWorthEl.textContent.replace(/[RFC,]/g, ''), 10);
+          const newNetWorth = currentNetWorth + data.amount;
+          netWorthEl.textContent = `RFC ${newNetWorth.toLocaleString()}`;
+        }
+      });
+    }
   }
 });

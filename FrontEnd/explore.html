@@ -17,15 +17,27 @@
     RiseFaze
   </a>
   <nav>
-    <input type="search" placeholder="Search assets, users..." class="search-input">
+    <input type="search" placeholder="Search assets, categories.." class="search-input">
     <button class="btn mode-toggle" id="modeToggle">🌙</button>
     <button class="btn login-btn" id="loginBtn">Login</button>
     <button class="btn primary-btn" id="signupBtn">Sign Up</button>     
   </nav>
 </header>
-
+<br><br>
+<div class="dashboard-header">
+  <h1>Welcome to the Explore.</h1>
+  <p>This is where you can find all kinds of assets!</p>
+</div>
 <!-- Main Content: Assets Grid -->
 <main class="assets-container lazy-load">
+  <!-- Sticky RFC Balance Display -->
+  <div class="sticky-balance-container">
+    <div class="feature-card balance-display">
+      <span class="balance-label">Your Balance:</span>
+      <span class="balance-value" id="explore-rfc-balance">Loading...</span>
+    </div>
+  </div>
+
   <!-- Leaderboard Section -->
   <div class="leaderboard-container">
     <h2>Global Leaderboard</h2>
@@ -63,6 +75,9 @@
 
 <!-- Floating Feedback Button -->
 <button class="feedback-btn" id="feedbackBtn" title="Send Feedback">Feedback</button>
+
+<!-- Notification Container -->
+<div id="notification-container"></div>
 
 <script src="main.js"></script>
 </body>

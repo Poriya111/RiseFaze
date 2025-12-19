@@ -2,41 +2,24 @@ const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema(
   {
-    username: {
-      type: String,
-      required: [true, 'Please add a username'],
-      unique: true,
-      trim: true,
-    },
-    email: {
-      type: String,
-      required: [true, 'Please add an email'],
-      unique: true,
-      trim: true,
-    },
-    password: {
-      type: String,
-      required: [true, 'Please add a password'],
-    },
-    rfcBalance: {
-      type: Number,
-      required: true,
-      default: 10000, // Starting balance
-    },
-    netWorth: {
-      type: Number,
-      required: true,
-      default: 10000, // Net worth starts equal to balance
-    },
+    username: { type: String, required: true, unique: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    rfcBalance: { type: Number, default: 500 },
+    netWorth: { type: Number, default: 500 },
     ownedAssets: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Asset',
       },
     ],
+    previousNetWorth: {
+      type: Number,
+      default: 1000,
+    },
   },
   {
-    timestamps: true, // Automatically adds createdAt and updatedAt fields
+    timestamps: true, // This automatically adds createdAt and updatedAt
   }
 );
 

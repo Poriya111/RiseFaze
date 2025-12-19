@@ -7,588 +7,131 @@
   <title>RiseFaze — Dashboard</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="light-mode">
 
 <!-- Header -->
 <header class="header">
-  <a href="dashboard.html" class="logo">
+  <a href="index.html" class="logo">
     <img src="media/logo.png" alt="RiseFaze logo" class="logo-img">
     RiseFaze
   </a>
   <nav>
-    <a href="explore.html" class="nav-link">Explore Assets</a>
-    <button class="btn text-btn" id="newsBtn" title="RiseFaze News">News</button>
-    <button class="btn text-btn" id="notificationsBtn" title="Notifications">Alerts</button>
-    <a href="help.html" class="btn text-btn" id="helpBtn" title="Help">Help</a>
-    <button class="btn mode-toggle" id="modeToggle">🌙</button>
+    <a href="explore.html" class="nav-link">Explore</a>
+    <a href="help.html" class="nav-link">Help</a>
+    <a href="news.html" class="nav-link">News</a>
+    <button class="btn" id="notificationsPopup">Notifications</button>
+
     <div class="profile-menu-container">
-      <button class="btn icon-btn profile-btn" id="profileBtn" title="Profile">🙍‍♂️</button>
-      <!-- Profile Popup/Dropdown -->
-      <div id="profilePopup" class="profile-popup feature-card">
-        <a href="index.html" class="btn primary-btn" id="logoutBtn">Logout</a>
+      <button class="btn icon-btn" id="profileBtn" title="Profile & Settings">🙍‍♂️</button>
+      <!-- Profile Dropdown -->
+      <div class="feature-card profile-popup" id="profilePopup">
+        <!-- <a href="#" class="text-btn">Settings</a> -->
+        <a href="#" class="text-btn" id="logoutBtn">Logout</a>
       </div>
     </div>
+    <button class="btn mode-toggle" id="modeToggle">🌙</button>
   </nav>
 </header>
 
-<!-- Main Dashboard Content -->
+<!-- Main Content: Dashboard -->
 <main class="dashboard-container lazy-load">
-  <!-- User Welcome -->
   <div class="dashboard-header">
-    <h1>Welcome back, <span id="username-placeholder">...</span>!</h1>
-    <p>Here's a snapshot of your empire's performance.</p>
+    <h1>Welcome back, <span id="username-placeholder">User</span>!</h1>
+    <p>Here's a snapshot of your financial empire.</p>
   </div>
 
-  <!-- KPI Cards -->
+  <!-- KPI Grid -->
   <div class="kpi-grid">
-    <div class="kpi-card feature-card">
-      <div class="kpi-label">Total Net Worth</div>
-      <div class="kpi-value" id="kpi-net-worth">--</div>
+    <div class="feature-card kpi-card">
+      <div class="kpi-label">Net Worth</div>
+      <div class="kpi-value" id="kpi-net-worth">RFC 0</div>
       <div class="kpi-change" id="kpi-net-worth-change">--</div>
     </div>
-    <div class="kpi-card feature-card">
+    <div class="feature-card kpi-card">
       <div class="kpi-label">RFC Balance</div>
-      <div class="kpi-value" id="kpi-rfc-balance">--</div>
-      <div class="kpi-subtext">Available to invest</div>
+      <div class="kpi-value" id="kpi-rfc-balance">RFC 0</div>
+      <div class="kpi-subtext">Available to spend</div>
     </div>
-    <div class="kpi-card feature-card">
+    <div class="feature-card kpi-card">
       <div class="kpi-label">Assets Owned</div>
-      <div class="kpi-value" id="kpi-assets-owned">--</div>
-      <div class="kpi-subtext">Across 3 categories</div>
+      <div class="kpi-value" id="kpi-assets-owned">0</div>
+      <div class="kpi-subtext">Across all categories</div>
     </div>
-    <div class="kpi-card feature-card">
+    <div class="feature-card kpi-card">
       <div class="kpi-label">Global Rank</div>
-      <div class="kpi-value" id="kpi-global-rank">--</div>
-      <div class="kpi-change" id="kpi-global-rank-change">--</div>
+      <div class="kpi-value" id="kpi-global-rank">#--</div>
     </div>
   </div>
 
-  
-  
-
-<!-- Dashboard Sections -->
-<!-- Performance Graph -->
-<div class="dashboard-section feature-card performance-graph-container">
-  <h2>Performance</h2>
-  <div class="chart-controls">
-    <div class="chart-toggle">
-      <button class="btn chart-toggle-btn active" data-type="netWorth">Net Worth</button>
-      <button class="btn chart-toggle-btn" data-type="rank">Global Rank</button>
-    </div>
-    <div class="time-toggle">
-      <button class="btn time-toggle-btn" data-time="hourly">Hours</button>
-      <button class="btn time-toggle-btn active" data-time="daily">Days</button>
-      <button class="btn time-toggle-btn" data-time="monthly">Months</button>
-    </div>
-  </div>
-  <canvas id="performanceChart"></canvas>
-</div>
-<br><br>
- <!-- Contribution Graph -->
-  <div class="dashboard-section feature-card contribution-graph-container">
-    <h2 id="contribution-graph-heading">Your Activity in...</h2>
-    <div class="contribution-graph">
-      <div class="graph-months">
-        <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
-      </div>
-      <div class="graph-body">
-
-        <div class="graph-squares">
-          <!-- Squares are now generated by main.js -->
-        </div>
-      </div>
-    </div>
-  </div>
-<br><br>
+  <!-- Dashboard Main Grid -->
   <div class="dashboard-main-grid">
-
-    <!-- My Assets List -->
-    <div class="dashboard-section feature-card owned-assets-container">
-      <h2>Owned Assets</h2>
+    <!-- Owned Assets Section -->
+    <section class="dashboard-section feature-card owned-assets-container">
+      <h2>Your Assets</h2>
       <div class="owned-assets-grid">
-        <!-- Asset cards will be dynamically inserted here by main.js -->
+        <!-- Owned asset cards will be dynamically inserted here -->
+        <p class="empty-state-message">Loading your assets...</p>
       </div>
-      <a href="explore.html" class="btn primary-btn" id="exploreAssetsBtn">Explore & Buy New Assets</a>
-    </div>
-  </div>
-  
- 
+      <a href="explore.html" class="btn primary-btn" id="exploreAssetsBtn" style="margin-top: 20px;">Explore More Assets</a>
+    </section>
 
+  </div>
+<br><br><br>
+
+  <!-- Performance Graph -->
+  <section class="dashboard-section feature-card performance-graph-container">
+    <h2>Performance Overview</h2>
+    <div class="chart-controls">
+      <div class="chart-toggle">
+        <button class="chart-toggle-btn active" data-type="netWorth">Net Worth</button>
+        <button class="chart-toggle-btn" data-type="rank">Global Rank</button>
+      </div>
+      <div class="time-toggle">
+        <button class="time-toggle-btn" data-time="oneHour">1H</button>
+        <button class="time-toggle-btn" data-time="twelveHours">12H</button>
+        <button class="time-toggle-btn active" data-time="daily">7D</button>
+        <button class="time-toggle-btn" data-time="monthly">6M</button>
+      </div>
+    </div>
+    <div class="chart-container" style="position: relative; height:300px; width:100%">
+      <canvas id="performanceChart"></canvas>
+    </div>
+  </section>
 </main>
 
-<!-- Footer -->
-<footer class="footer">
-  <div class="footer-content">
-    <p>&copy; 2025 RiseFaze. All rights reserved. <strong>Version 1.0</strong></p>
-    <div class="footer-links">
-      <a href="terms.html">Terms</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="contact.html">Contact</a>
-    </div>
-  </div>
-</footer>
-
-<!-- Floating Feedback Button -->
-<button class="feedback-btn" id="feedbackBtn" title="Send Feedback">Feedback</button>
-
-<!-- RiseFaze News Modal -->
-<div id="newsModal" class="modal-overlay">
-  <div class="modal-content feature-card">
-    <button class="modal-close-btn">&times;</button>
-    <h2>RiseFaze News</h2>
-    <div class="popup-list">
-      <p class="empty-state-message">No recent news.</p>
-    </div>
-  </div>
-</div>
-
-<!-- Notifications Modal -->
-<div id="notificationsModal" class="modal-overlay">
-  <div class="modal-content feature-card">
-    <button class="modal-close-btn">&times;</button>
-    <h2>Notifications</h2>
-    <div class="popup-list">
-      <p class="empty-state-message">You have no new notifications.</p>
-    </div>
-  </div>
-</div>
-
-<!-- Asset Details Modal -->
-<div id="assetModal" class="modal-overlay">
+<!-- Modals -->
+<div class="modal-overlay" id="assetModal">
   <div class="modal-content feature-card">
     <button class="modal-close-btn">&times;</button>
     <div class="modal-asset-icon"></div>
     <h2 id="modalAssetName">Asset Name</h2>
-    <div class="modal-details">
-      <p><strong>Current Value:</strong> <span id="modalAssetPrice"></span></p>
-      <p><strong>Description:</strong> <span id="modalAssetDescription"></span></p>
-      <!-- More details can be added here -->
-      <p><strong>Bank Buy Price:</strong> <span id="modalBankBuyPrice">RFC 0</span></p>
-    </div>
+    <p id="modalAssetPrice">Value: RFC 0</p>
+    <p id="modalAssetDescription" class="modal-details">Description goes here.</p>
     <div class="modal-actions">
-      <button class="btn primary-btn" id="sellAssetBtn" data-action="sell-to-bank">Sell to RiseFaze Assets Bank</button>
+      <input type="number" id="sellPriceInput" class="modal-input" placeholder="Enter sell price">
+      <button class="btn primary-btn" id="sellAssetBtn">Sell to Bank</button>
+    </div>
+    <p id="maxSellPriceInfo" style="text-align: center; opacity: 0.7; font-size: 14px; margin-top: 10px;"></p>
+  </div>
+</div>
+
+<!-- Notifications Modal -->
+<div class="modal-overlay" id="notificationsModal">
+  <div class="modal-content feature-card">
+    <button class="modal-close-btn">&times;</button>
+    <h2>Recent Notifications (24h)</h2>
+    <div class="popup-list" id="notificationsList">
+      <!-- Notifications will be loaded here -->
     </div>
   </div>
 </div>
 
+<!-- Notification Container -->
+<div id="notification-container"></div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="main.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--
