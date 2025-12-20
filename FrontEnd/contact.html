@@ -29,24 +29,13 @@
 
 <!-- Main Content -->
 <main class="static-page-container lazy-load">
-  <div class="feature-card auth-form-card" style="max-width: 500px;">
-    <h2>Get in Touch</h2>
-    <p>Have a question, feedback, or a business inquiry? Send a message below.</p>
-    <form id="contactForm">
-      <div class="auth-form-group">
-        <label for="name">Your Name</label>
-        <input id="name" name="name" type="text" required placeholder="Your Name" />
-      </div>
-      <div class="auth-form-group">
-        <label for="email">Your Email</label>
-        <input id="email" name="email" type="email" required placeholder="you@example.com" />
-      </div>
-      <div class="auth-form-group">
-        <label for="message">Message</label>
-        <textarea id="message" name="message" required placeholder="Your message..." rows="5"></textarea>
-      </div>
-      <button type="submit" class="btn primary-btn auth-submit-btn">Send Message</button>
-    </form>
+  <div class="feature-card auth-form-card" style="width: 90%; max-width: 1200px; margin: 0 auto;">
+    <h2>Contact Support</h2>
+    <p>Encountered a bug, have a feature request, or just want to say hello? We'd love to hear from you.</p>
+    <div style="margin-top: 2rem; text-align: center;">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ptc.p.a.m.original@gmail.com&su=RiseFaze+Support+Inquiry" id="emailSupportBtn" target="_blank" class="btn primary-btn" style="display: inline-block; text-decoration: none; margin-right: 1rem;">Email Support</a>
+      <a href="feedback.html" class="btn primary-btn" style="display: inline-block; text-decoration: none;">Feedback</a>
+    </div>
   </div>
 </main>
 
@@ -61,6 +50,9 @@
     </div>
   </div>
 </footer>
+
+<!-- Floating Feedback Button -->
+<button class="feedback-btn" id="feedbackBtn" title="Send Feedback">Feedback</button>
 
 <script src="main.js"></script>
 </body>

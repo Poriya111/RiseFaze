@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (loginBtn) loginBtn.style.display = 'none';
       if (signupBtn) signupBtn.style.display = 'none';
 
+      // Also hide any navigation links to login/signup pages (for pages that use <a> tags)
+      const authLinks = nav.querySelectorAll('a[href="login.html"], a[href="signup.html"]');
+      authLinks.forEach(link => link.style.display = 'none');
+
       // Check if the current page is the dashboard
       const onDashboard = window.location.pathname.endsWith('/dashboard.html');
 
@@ -68,28 +72,44 @@ document.addEventListener('DOMContentLoaded', () => {
   const getStartedBtn = document.getElementById('getStartedBtn');
   if (getStartedBtn) {
     getStartedBtn.addEventListener('click', () => {
-      window.location.href = 'signup.html';
+      if (localStorage.getItem('authToken')) {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'signup.html';
+      }
     });
   }
 
   const startJourneyBtn = document.getElementById('startJourneyBtn');
   if (startJourneyBtn) {
     startJourneyBtn.addEventListener('click', () => {
-      window.location.href = 'signup.html';
+      if (localStorage.getItem('authToken')) {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'signup.html';
+      }
     });
   }
 
   const signupBtn = document.getElementById('signupBtn');
   if (signupBtn) {
     signupBtn.addEventListener('click', () => {
-      window.location.href = 'signup.html';
+      if (localStorage.getItem('authToken')) {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'signup.html';
+      }
     });
   }
 
   const loginBtn = document.getElementById('loginBtn');
   if (loginBtn) {
     loginBtn.addEventListener('click', () => {
-      window.location.href = 'login.html';
+      if (localStorage.getItem('authToken')) {
+        window.location.href = 'dashboard.html';
+      } else {
+        window.location.href = 'login.html';
+      }
     });
   }
 
@@ -237,6 +257,42 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Thank you for your message! We will get back to you shortly.');
       this.reset(); // Clear the form
     });
+  }
+
+  // Email Support Button: Dynamic Body with Username
+  const emailSupportBtn = document.getElementById('emailSupportBtn');
+  if (emailSupportBtn) {
+    const updateMailLink = (username) => {
+      const currentHref = emailSupportBtn.getAttribute('href');
+      // Base body text
+      let body = "Hello RiseFaze Support,\n\n";
+      
+      if (username) {
+        body += `\n\n\nUsername: ${username}`;
+      }
+      
+      // Append body param
+      const newHref = `${currentHref}&body=${encodeURIComponent(body)}`;
+      emailSupportBtn.setAttribute('href', newHref);
+    };
+
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      fetch('http://localhost:5001/api/users/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.ok ? res.json() : null)
+      .then(user => {
+        if (user && user.username) {
+          updateMailLink(user.username);
+        } else {
+          updateMailLink();
+        }
+      })
+      .catch(() => updateMailLink());
+    } else {
+      updateMailLink();
+    }
   }
 
   // Create hidden buttons for pages that need them (signup, login)
