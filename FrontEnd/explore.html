@@ -53,7 +53,41 @@
   </div>
   <!-- Marketplace Section -->
   <div class="marketplace-container">
-    <h2>RiseFaze Bank Assets</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2>RiseFaze Bank Assets</h2>
+      <div style="position: relative;">
+        <button id="openFilterBtn" class="btn secondary-btn">Filter ▾</button>
+        
+        <!-- Filter Popup -->
+        <div class="feature-card filter-popup" id="filterPopup">
+          <div class="filter-controls popup-filter-controls">
+            <div class="filter-group">
+              <label for="categoryFilter">Category</label>
+              <select id="categoryFilter" class="filter-input">
+                <option value="all">All Categories</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="sortFilter">Sort By</label>
+              <select id="sortFilter" class="filter-input">
+                <option value="default">Default</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="name-asc">Name: A-Z</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label>Price Range (RFC)</label>
+              <div class="price-inputs">
+                <input type="number" id="minPrice" placeholder="Min" class="filter-input">
+                <input type="number" id="maxPrice" placeholder="Max" class="filter-input">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="assets-grid">
       <!-- Asset cards will be dynamically inserted here by main.js -->
       <p class="loading-message" id="assets-loading">Loading assets from the bank...</p>

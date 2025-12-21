@@ -320,7 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
  
     const closeModal = () => {
       assetModal.classList.remove('visible');
-      document.body.classList.remove('popup-open');
     };
  
     closeModalBtn.addEventListener('click', closeModal);
@@ -358,7 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
  
         // Show modal
         assetModal.classList.add('visible');
-        document.body.classList.add('popup-open');
       }
     });
  
@@ -414,7 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
           // --- FIX: Optimistically update UI since the backend logic succeeds before crashing ---
           showNotification('Asset sold successfully!', 'success');
           assetModal.classList.remove('visible'); // Close the modal
-          document.body.classList.remove('popup-open'); // Ensure body scroll is re-enabled
           renderDashboardData(); // Re-fetch all dashboard data to ensure consistency
 
         } catch (error) {
@@ -429,12 +426,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const notificationsModal = document.getElementById('notificationsModal');
   const profilePopup = document.getElementById('profilePopup');
+  const filterPopup = document.getElementById('filterPopup');
 
-  const allPopups = [profilePopup, assetModal, notificationsModal];
+  const allPopups = [profilePopup, assetModal, notificationsModal, filterPopup];
 
   const closeAllPopups = () => {
     allPopups.forEach(p => p && p.classList.remove('visible'));
-    document.body.classList.remove('popup-open');
   };
 
   const setupPopup = (button, popup) => {
@@ -446,10 +443,6 @@ document.addEventListener('DOMContentLoaded', () => {
       closeAllPopups();
       if (!isVisible) {
         popup.classList.add('visible');
-        document.body.classList.add('popup-open');
-        if (popup.id !== 'notificationsModal') { // Only add popup-open for modals other than notifications
-          document.body.classList.add('popup-open');
-        }
       }
     });
 
@@ -469,6 +462,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupPopup(profileBtn, profilePopup);
   setupPopup(document.getElementById('notificationsPopup'), notificationsModal);
+  
+  // Filter Popup Logic
+  setupPopup(document.getElementById('openFilterBtn'), filterPopup);
 
   // Specific logic for fetching notifications when the popup is opened
   const notificationsBtn = document.getElementById('notificationsPopup');
@@ -515,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Global click listener to close popups
   document.addEventListener('click', (e) => {
     // If the click is outside a popup and not on a trigger button
-    if (!e.target.closest('.modal-content, .profile-popup, .more-btn, .icon-btn')) {
+    if (!e.target.closest('.modal-content, .profile-popup, .filter-popup, .more-btn, .icon-btn')) {
       closeAllPopups();
     }
   });
@@ -658,6 +654,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const renderMarketplaceAssets = async (user = null) => {
     const assetsGrid = document.querySelector('.assets-grid');
     const loadingMessage = document.getElementById('assets-loading');
+    const categorySelect = document.getElementById('categoryFilter');
     if (!assetsGrid || !loadingMessage) return;
 
     try {
@@ -671,6 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
       
+      const categories = new Set();
       assetsGrid.innerHTML = ''; // Clear loading message
       bankAssets.forEach(asset => {
         const card = document.createElement('div');
@@ -706,6 +704,28 @@ document.addEventListener('DOMContentLoaded', () => {
         card.dataset.name = asset.name.toLowerCase();
         card.dataset.price = asset.price; // Ensure price is in dataset
         card.dataset.category = asset.category.toLowerCase();
+        // Assume asset has income or yield, default to 0 if not present
+        let rawIncome = asset.income || asset.yield || asset.yieldRate || asset.revenue || asset.profit || asset.return || asset.roi || asset.dailyIncome || 0;
+        
+        // Fallback: Check description for percentage if income is not explicitly found
+        if (!rawIncome && asset.description) {
+             const descMatch = asset.description.match(/(\d+(\.\d+)?)%/);
+             if (descMatch) {
+                 rawIncome = descMatch[1];
+             }
+        }
+
+        if (typeof rawIncome === 'string') {
+            const match = rawIncome.match(/[\d\.]+/);
+            rawIncome = match ? match[0] : 0;
+        }
+        const income = parseFloat(rawIncome) || 0;
+        card.dataset.income = income;
+
+        if (asset.category) {
+            categories.add(asset.category);
+        }
+
         card.innerHTML = `
           <div class="asset-icon">${asset.emoji}</div>
           <div class="asset-info">
@@ -720,6 +740,18 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         assetsGrid.appendChild(card);
       });
+
+      // Populate Category Filter
+      if (categorySelect) {
+        // Keep the "All" option
+        categorySelect.innerHTML = '<option value="all">All Categories</option>';
+        categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.toLowerCase();
+            option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+            categorySelect.appendChild(option);
+        });
+      }
     } catch (error) {
       loadingMessage.textContent = 'Failed to load assets. Please try again later.';
       console.error('Failed to fetch marketplace assets:', error);
@@ -902,39 +934,79 @@ document.addEventListener('DOMContentLoaded', () => {
       renderMarketplaceAssets(user);
       renderLeaderboard(user);
 
-      // --- Add Search/Filter Logic for Explore Page ---
+      // --- Filter Logic ---
       const searchInput = document.querySelector('.search-input');
-      if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-          const searchTerm = e.target.value.toLowerCase();
-          const assetCards = document.querySelectorAll('.assets-grid .asset-card');
-          let visibleCount = 0;
+      const categoryFilter = document.getElementById('categoryFilter');
+      const sortFilter = document.getElementById('sortFilter');
+      const minPriceInput = document.getElementById('minPrice');
+      const maxPriceInput = document.getElementById('maxPrice');
 
-          assetCards.forEach(card => {
+      const applyFilters = () => {
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+        const selectedCategory = categoryFilter ? categoryFilter.value : 'all';
+        const sortBy = sortFilter ? sortFilter.value : 'default';
+        const minPrice = minPriceInput && minPriceInput.value ? parseFloat(minPriceInput.value) : 0;
+        const maxPrice = maxPriceInput && maxPriceInput.value ? parseFloat(maxPriceInput.value) : Infinity;
+
+        const assetsGrid = document.querySelector('.assets-grid');
+        const assetCards = Array.from(document.querySelectorAll('.assets-grid .asset-card'));
+        let visibleCount = 0;
+
+        // Filter
+        assetCards.forEach(card => {
             const name = card.dataset.name || '';
             const category = card.dataset.category || '';
+            const price = parseFloat(card.dataset.price || 0);
 
-            if (name.includes(searchTerm) || category.includes(searchTerm)) {
-              card.style.display = 'flex'; // Show matching card
-              visibleCount++;
+            const matchesSearch = name.includes(searchTerm) || category.includes(searchTerm);
+            const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
+            const matchesPrice = price >= minPrice && price <= maxPrice;
+
+            if (matchesSearch && matchesCategory && matchesPrice) {
+                card.style.display = 'flex';
+                visibleCount++;
             } else {
-              card.style.display = 'none'; // Hide non-matching card
+                card.style.display = 'none';
             }
-          });
-
-          // Handle empty state for search results
-          const assetsGrid = document.querySelector('.assets-grid');
-          let emptyMessage = assetsGrid.querySelector('.empty-state-message');
-          if (visibleCount === 0 && !emptyMessage) {
-            emptyMessage = document.createElement('p');
-            emptyMessage.className = 'empty-state-message';
-            emptyMessage.textContent = 'No assets match your search.';
-            assetsGrid.appendChild(emptyMessage);
-          } else if (visibleCount > 0 && emptyMessage) {
-            emptyMessage.remove();
-          }
         });
-      }
+
+        // Sort
+        if (sortBy !== 'default') {
+            assetCards.sort((a, b) => {
+                const priceA = parseFloat(a.dataset.price);
+                const priceB = parseFloat(b.dataset.price);
+                const nameA = a.dataset.name;
+                const nameB = b.dataset.name;
+
+                if (sortBy === 'price-asc') return priceA - priceB;
+                if (sortBy === 'price-desc') return priceB - priceA;
+                if (sortBy === 'name-asc') return nameA.localeCompare(nameB);
+                return 0;
+            });
+            // Re-append in new order
+            assetCards.forEach(card => assetsGrid.appendChild(card));
+        }
+
+        // Empty State
+        let emptyMessage = assetsGrid.querySelector('.empty-state-message-filter');
+        if (visibleCount === 0) {
+            if (!emptyMessage) {
+                emptyMessage = document.createElement('p');
+                emptyMessage.className = 'empty-state-message empty-state-message-filter';
+                emptyMessage.textContent = 'No assets match your filters.';
+                assetsGrid.appendChild(emptyMessage);
+            }
+        } else if (emptyMessage) {
+            emptyMessage.remove();
+        }
+      };
+
+      // Attach listeners
+      if (searchInput) searchInput.addEventListener('input', applyFilters);
+      if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
+      if (sortFilter) sortFilter.addEventListener('change', applyFilters);
+      if (minPriceInput) minPriceInput.addEventListener('input', applyFilters);
+      if (maxPriceInput) maxPriceInput.addEventListener('input', applyFilters);
     };
     initializeExplorePage();
   }
