@@ -1146,6 +1146,18 @@ document.addEventListener('DOMContentLoaded', () => {
           netWorthEl.textContent = `RFC ${newNetWorth.toLocaleString()}`;
         }
       });
+
+      // Listen for global asset sales to prevent double purchasing
+      socket.on('asset-sold', (data) => {
+        // Find the asset card in the explore page and remove it
+        const assetCard = document.querySelector(`.asset-card[data-id="${data.assetId}"]`);
+        if (assetCard) {
+          assetCard.style.transition = 'opacity 0.5s, transform 0.5s';
+          assetCard.style.opacity = '0';
+          assetCard.style.transform = 'scale(0.9)';
+          setTimeout(() => assetCard.remove(), 500);
+        }
+      });
     }
   }
 });

@@ -70,7 +70,8 @@ const buyAsset = asyncHandler(async (req, res) => {
     res.status(200).json({ message: 'Asset purchased successfully', assetId });
   } catch (error) {
     await session.abortTransaction();
-    res.status(500); // Internal Server Error for other transaction failures
+    // Only set 500 if a more specific status code hasn't already been set
+    if (res.statusCode === 200) res.status(500);
     throw new Error(`Purchase transaction failed: ${error.message}`);
   } finally {
     session.endSession();

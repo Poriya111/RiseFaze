@@ -27,6 +27,10 @@ const io = new Server(server, {
 // --- Socket.io Connection Logic ---
 const userSockets = {}; // In-memory mapping of userId to socketId
 
+// Make io and userSockets available to routes via req.app.get()
+app.set('io', io);
+app.set('userSockets', userSockets);
+
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
 
