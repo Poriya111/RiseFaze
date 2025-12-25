@@ -114,7 +114,7 @@ header nav a:hover::after {
   padding: 8px 16px;
   border-radius: 10px;
   border: 1px solid var(--accent);
-  background: #ffffff20;
+  background: transparent;
   color: var(--text-color);
   font-size: 14px;
   transition: all 0.3s ease;
@@ -124,9 +124,7 @@ header nav a:hover::after {
 .search-input:focus {
   outline: none;
   border-color: var(--accent);
-  background: var(--card-bg);
-  filter: drop-shadow(0 5px 15px #9ac9ff);
-
+  box-shadow: 0 0 50px var(--accent);
 }
 
 /* Buttons */
@@ -1036,11 +1034,9 @@ footer a:hover::after {
   border-radius: 20px;
   padding: 30px;
   margin-bottom: 60px; /* Space between leaderboard and assets grid */
-  border: 1px solid rgba(255,255,255,0.2);
   /* these shadows make the leaderboard look special */
-  filter: drop-shadow(0 0 20px #b9daffa9);
-  box-shadow: 0 5px 20px 20px #9ac9ff27;
-
+  box-shadow: 0 0 50px var(--accent);
+  border: 1px solid var(--accent)
 }
 
 .leaderboard-container h2 {

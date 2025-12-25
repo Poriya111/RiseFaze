@@ -146,6 +146,13 @@ const sellAsset = asyncHandler(async (req, res) => {
     await session.commitTransaction();
 
     // --- WebSocket Emission ---
+    // 1. Broadcast to all users to update the leaderboard
+    io.emit('leaderboard-update', {
+      userId: userInTransaction._id,
+      username: userInTransaction.username,
+      netWorth: userInTransaction.netWorth
+    });
+
     // Send a targeted update to the user who sold the asset
     const userSocketId = userSockets[userId];
     if (userSocketId) {

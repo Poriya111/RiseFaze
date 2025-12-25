@@ -1,6 +1,8 @@
 // Run this function when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
   // --- Global UI setup based on login state ---
+  let currentUser = null; // Store the current user globally for socket updates
+
   const checkLoginState = () => {
     const isLoggedIn = localStorage.getItem('authToken');
 
@@ -780,6 +782,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = document.createElement('li');
         item.className = 'leaderboard-item';
 
+        let displayNetWorth = leaderboardUser.netWorth;
+
         // Check if this leaderboard entry is the currently logged-in user
         if (currentUser && currentUser.username === leaderboardUser.username) {
           item.classList.add('current-user'); // Add a class for styling
@@ -788,7 +792,7 @@ document.addEventListener('DOMContentLoaded', () => {
         item.innerHTML = `
           <span class="rank">${leaderboardUser.rank}</span>
           <span class="user-name">${leaderboardUser.username}</span>
-          <span class="net-worth">RFC ${leaderboardUser.netWorth.toLocaleString()}</span>
+          <span class="net-worth">RFC ${displayNetWorth.toLocaleString()}</span>
         `;
         leaderboardList.appendChild(item);
       });
@@ -841,6 +845,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const userData = await response.json();
+      currentUser = userData; // Update global reference
 
       // Populate Net Worth Change KPI
       const netWorthChangeEl = document.getElementById('kpi-net-worth-change');
@@ -918,6 +923,7 @@ document.addEventListener('DOMContentLoaded', () => {
           });
           if (userResponse.ok) {
             user = await userResponse.json();
+            currentUser = user; // Update global reference
             // --- NEW: Populate the sticky balance display ---
             const balanceEl = document.getElementById('explore-rfc-balance');
             if (balanceEl) {
@@ -1096,10 +1102,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Run logic for the dashboard page
-  if (document.querySelector('.dashboard-container')) {
-    renderDashboardData();
-
+  // --- Global Socket.io Logic (Runs on all pages if logged in) ---
+  const initSocket = () => {
     // --- Socket.io Real-time Notifications ---
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -1158,6 +1162,21 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => assetCard.remove(), 500);
         }
       });
+
+      // Listen for leaderboard updates
+      socket.on('leaderboard-update', () => {
+        // Only update if the leaderboard is present on the page
+        if (document.querySelector('.leaderboard-list')) {
+          renderLeaderboard(currentUser);
+        }
+      });
     }
+  };
+
+  initSocket();
+
+  // Run logic for the dashboard page
+  if (document.querySelector('.dashboard-container')) {
+    renderDashboardData();
   }
 });
