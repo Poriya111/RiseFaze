@@ -261,6 +261,70 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // General User Feedback Form Submission
+  const generalFeedbackForm = document.getElementById('generalFeedbackForm');
+  if (generalFeedbackForm) {
+    generalFeedbackForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      let bodyText = "General User Feedback Submission:\n\n";
+      const formData = new FormData(generalFeedbackForm);
+
+      // Iterate through form entries to build the email body
+      for (const [name, value] of formData.entries()) {
+        const element = generalFeedbackForm.elements[name];
+        let labelText = name;
+
+        // Attempt to find the question text from the label
+        if (element && element.id) {
+          const label = document.querySelector(`label[for="${element.id}"]`);
+          if (label) labelText = label.innerText;
+        }
+
+        bodyText += `Q: ${labelText}\nA: ${value}\n\n`;
+      }
+
+      const email = "ptc.p.a.m.original@gmail.com";
+      const subject = encodeURIComponent("RiseFaze General User Feedback");
+      const body = encodeURIComponent(bodyText);
+
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`;
+      window.open(gmailUrl, '_blank');
+    });
+  }
+
+  // Developer Feedback Form Submission
+  const developerFeedbackForm = document.getElementById('developerFeedbackForm');
+  if (developerFeedbackForm) {
+    developerFeedbackForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      let bodyText = "RiseFaze Developer Feedback Submission:\n\n";
+      const formData = new FormData(developerFeedbackForm);
+
+      // Iterate through form entries to build the email body
+      for (const [name, value] of formData.entries()) {
+        const element = developerFeedbackForm.elements[name];
+        let labelText = name;
+
+        // Attempt to find the question text from the label
+        if (element && element.id) {
+          const label = document.querySelector(`label[for="${element.id}"]`);
+          if (label) labelText = label.innerText;
+        }
+
+        bodyText += `Q: ${labelText}\nA: ${value}\n\n`;
+      }
+
+      const email = "ptc.p.a.m.original@gmail.com";
+      const subject = encodeURIComponent("RiseFaze Developer Feedback");
+      const body = encodeURIComponent(bodyText);
+
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${email}&su=${subject}&body=${body}`;
+      window.open(gmailUrl, '_blank');
+    });
+  }
+
   // Email Support Button: Dynamic Body with Username
   const emailSupportBtn = document.getElementById('emailSupportBtn');
   if (emailSupportBtn) {

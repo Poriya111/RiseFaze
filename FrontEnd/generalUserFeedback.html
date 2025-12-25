@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" href="media/favicon.png"/>
+  <title>RiseFaze — General User Feedback</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Inline styles to ensure form elements match the theme */
+    .feedback-input, .feedback-select, .feedback-textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border-color, #ccc);
+      border-radius: 8px;
+      background-color: var(--bg-secondary, #f9f9f9);
+      color: var(--text-primary, #333);
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      box-sizing: border-box;
+      margin-top: 6px;
+    }
+    .feedback-textarea {
+      resize: vertical;
+    }
+    /* Dark mode support (inherits from body class via main.js) */
+    body.dark-mode .feedback-input, 
+    body.dark-mode .feedback-select, 
+    body.dark-mode .feedback-textarea {
+      background-color: #2d2d2d;
+      border-color: #444;
+      color: #fff;
+    }
+  </style>
+</head>
+<body class="light-mode">
+
+<!-- Header -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <img src="media/logo.png" alt="RiseFaze logo" class="logo-img">
+    RiseFaze
+  </a>
+  <nav>
+    <a href="index.html" class="nav-link">Home</a>
+    <a href="explore.html" class="nav-link">Explore</a>
+    <a href="feedback.html" class="nav-link">Back</a>
+    <button class="btn mode-toggle" id="modeToggle">🌙</button>
+  </nav>
+</header>
+<br><br><br>
+<!-- Main Content -->
+<main class="static-page-container lazy-load">
+  <div class="feature-card auth-form-card" style="width: 90%; max-width: 800px; margin: 0 auto;">
+    <h2>General User Feedback</h2>
+    <p>Help me improve the RiseFaze economy and gameplay experience.<br>
+    <strong style="font-size: larger;">Please fill this form seriously, your opinion matters!</strong></p>
+    
+    <form id="generalFeedbackForm" style="margin-top: 2rem;">
+      
+      <!-- SECTION 1: UI & UX -->
+      <h3 style="margin-top: 20px; border-bottom: 1px solid var(--border-color, #ccc); padding-bottom: 10px;">🎨 UI & User Experience</h3>
+      
+      <!-- Q1 -->
+      <div class="auth-form-group">
+        <label for="q1">1. How would you rate the overall visual theme (colors, fonts)?</label>
+        <select id="q1" name="ui_theme_rating" class="feedback-select">
+          <option value="" disabled selected>Select rating</option>
+          <option value="5">5 - Beautiful & Clean</option>
+          <option value="4">4 - Good</option>
+          <option value="3">3 - Average</option>
+          <option value="2">2 - Needs Polish</option>
+          <option value="1">1 - Unappealing</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q2 -->
+      <div class="auth-form-group">
+        <label for="q2">2. Is the navigation bar intuitive on your device?</label>
+        <select id="q2" name="ui_nav_intuitive" class="feedback-select">
+           <option value="yes">Yes, very easy</option>
+           <option value="mostly">Mostly</option>
+           <option value="no">No, it's confusing</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q3 -->
+      <div class="auth-form-group">
+        <label for="q3">3. Does the Dashboard clearly communicate your financial standing?</label>
+        <select id="q3" name="ui_dashboard_clarity" class="feedback-select">
+           <option value="very_clear">Yes, crystal clear</option>
+           <option value="somewhat">Somewhat</option>
+           <option value="cluttered">No, it's cluttered</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q4 -->
+      <div class="auth-form-group">
+        <label for="q4">4. Are the Asset Cards (Price, Income) easy to read?</label>
+        <select id="q4" name="ui_asset_cards" class="feedback-select">
+           <option value="yes">Yes</option>
+           <option value="no_font">No, font is too small</option>
+           <option value="no_contrast">No, contrast is bad</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q5 -->
+      <div class="auth-form-group">
+        <label for="q5">5. How is your experience with Dark Mode?</label>
+        <select id="q5" name="ui_dark_mode" class="feedback-select">
+           <option value="love_it">I use it all the time</option>
+           <option value="okay">It's okay</option>
+           <option value="issues">It has visibility issues</option>
+           <option value="dont_use">I don't use it</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q6 -->
+      <div class="auth-form-group">
+        <label for="q6">6. Do the animations (e.g. purchase fly-away) feel smooth?</label>
+        <select id="q6" name="ui_animations" class="feedback-select">
+           <option value="smooth">Yes, very smooth</option>
+           <option value="distracting">They are distracting</option>
+           <option value="laggy">They cause lag</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q7 -->
+      <div class="auth-form-group">
+        <label for="q7">7. How would you rate the mobile responsiveness?</label>
+        <select id="q7" name="ui_mobile" class="feedback-select">
+           <option value="desktop_only">I only use Desktop</option>
+           <option value="good">Good on mobile</option>
+           <option value="bad">Broken/Hard to use on mobile</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q8 -->
+      <div class="auth-form-group">
+        <label for="q8">8. Are the toast notifications (bottom right) helpful?</label>
+        <select id="q8" name="ui_notifications" class="feedback-select">
+           <option value="helpful">Yes, very helpful</option>
+           <option value="annoying">They are annoying/too frequent</option>
+           <option value="ignored">I ignore them</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- SECTION 2: Economy & Gameplay -->
+      <h3 style="margin-top: 30px; border-bottom: 1px solid var(--border-color, #ccc); padding-bottom: 10px;">📈 Economy & Gameplay</h3>
+
+      <!-- Q9 -->
+      <div class="auth-form-group">
+        <label for="q9">9. Is the starting RFC balance sufficient?</label>
+        <select id="q9" name="eco_start_balance" class="feedback-select">
+           <option value="perfect">Yes, perfect amount</option>
+           <option value="too_low">No, it's too low</option>
+           <option value="too_high">It's too high (too easy)</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q10 -->
+      <div class="auth-form-group">
+        <label for="q10">10. Is there enough variety in Asset Categories?</label>
+        <select id="q10" name="eco_asset_variety" class="feedback-select">
+           <option value="enough">Yes, plenty</option>
+           <option value="need_more">No, need more types (Crypto, Art, etc.)</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q11 -->
+      <div class="auth-form-group">
+        <label for="q11">11. Do asset prices feel balanced relative to income?</label>
+        <select id="q11" name="eco_pricing" class="feedback-select">
+           <option value="balanced">Yes, balanced</option>
+           <option value="expensive">Assets are too expensive</option>
+           <option value="cheap">Assets are too cheap</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q12 -->
+      <div class="auth-form-group">
+        <label for="q12">12. Is the 5% profit margin on selling assets fair?</label>
+        <select id="q12" name="eco_sell_margin" class="feedback-select">
+           <option value="fair">Yes, fair</option>
+           <option value="too_low">No, margin is too low</option>
+           <option value="too_high">No, margin is too high</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q13 -->
+      <div class="auth-form-group">
+        <label for="q13">13. How does the 6-hour repurchase cooldown affect you?</label>
+        <select id="q13" name="eco_cooldown" class="feedback-select">
+           <option value="fine">It's fine / prevents spam</option>
+           <option value="annoying">It's annoying / too long</option>
+           <option value="short">It should be longer</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q14 -->
+      <div class="auth-form-group">
+        <label for="q14">14. Does the Global Leaderboard motivate you?</label>
+        <select id="q14" name="eco_leaderboard" class="feedback-select">
+           <option value="yes">Yes, very motivating</option>
+           <option value="somewhat">Somewhat</option>
+           <option value="no">No, I don't care about rank</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q15 -->
+      <div class="auth-form-group">
+        <label for="q15">15. How is the overall progression pace?</label>
+        <select id="q15" name="eco_pace" class="feedback-select">
+           <option value="good">Good pace</option>
+           <option value="grindy">Too slow / Grindy</option>
+           <option value="fast">Too fast</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q16 -->
+      <div class="auth-form-group">
+        <label for="q16">16. Would you like assets that can lose value (Volatility)?</label>
+        <select id="q16" name="eco_volatility" class="feedback-select">
+           <option value="yes">Yes, adds realism</option>
+           <option value="no">No, I prefer safe growth</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- SECTION 3: Technical & Future -->
+      <h3 style="margin-top: 30px; border-bottom: 1px solid var(--border-color, #ccc); padding-bottom: 10px;">⚙️ Technical & Future</h3>
+
+      <!-- Q17 -->
+      <div class="auth-form-group">
+        <label for="q17">17. If P2P Trading is added, should transactions be taxed?</label>
+        <select id="q17" name="tech_p2p_tax" class="feedback-select">
+           <option value="yes">Yes, to control inflation</option>
+           <option value="no">No, free market</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q18 -->
+      <div class="auth-form-group">
+        <label for="q18">18. How important are social features (Guilds, Chat)?</label>
+        <select id="q18" name="tech_social" class="feedback-select">
+           <option value="very">Very important</option>
+           <option value="nice">Nice to have</option>
+           <option value="not">Not important</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q19 -->
+      <div class="auth-form-group">
+        <label for="q19">19. Does the site load quickly on your device?</label>
+        <select id="q19" name="tech_performance" class="feedback-select">
+           <option value="fast">Yes, very fast</option>
+           <option value="okay">It's okay</option>
+           <option value="slow">No, it's slow</option>
+        </select>
+      </div>
+      <br>
+
+      <!-- Q20 -->
+      <div class="auth-form-group">
+        <label for="q20">20. What is the ONE feature you want most?</label>
+        <input type="text" id="q20" name="feature_request" class="feedback-input" placeholder="e.g. Stock Market, Loans, etc.">
+      </div>
+      <br>
+
+      <!-- Q21 -->
+      <div class="auth-form-group">
+        <label for="q21">21. Any specific bugs or detailed feedback?</label>
+        <textarea id="q21" name="open_feedback" rows="4" class="feedback-textarea" placeholder="Tell me more..."></textarea>
+      </div>
+      <br>
+
+   <!-- last -->
+    <div class="auth-form-group">
+        <label for="satisfaction">22. How would you rate your experience with RiseFaze so far?</label>
+        <select id="satisfaction" name="satisfaction" class="feedback-select" required>
+          <option value="" disabled selected>Select a rating</option>
+          <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>
+          <option value="4">⭐⭐⭐⭐ (Good)</option>
+          <option value="3">⭐⭐⭐ (Average)</option>
+          <option value="2">⭐⭐ (Poor)</option>
+          <option value="1">⭐ (Terrible)</option>
+        </select>
+      </div>
+      <br>
+
+      <button type="submit" class="btn primary-btn auth-submit-btn" style="margin-top: 1.5rem;">Submit Feedback</button>
+    </form>
+  </div>
+</main>
+<br><br><br>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <p>&copy; 2025 RiseFaze. All rights reserved. <strong>Version 1.0</strong></p>
+    <div class="footer-links">
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
