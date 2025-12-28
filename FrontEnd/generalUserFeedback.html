@@ -281,7 +281,7 @@
       <!-- Q20 -->
       <div class="auth-form-group">
         <label for="q20">20. What is the ONE feature you want most?</label>
-        <input type="text" id="q20" name="feature_request" class="feedback-input" placeholder="e.g. Stock Market, Loans, etc.">
+        <textarea id="q20" name="open_feedback" rows="2" class="feedback-textarea" placeholder="e.g. Stock Market, Loans, etc."></textarea>
       </div>
       <br>
 
@@ -292,9 +292,20 @@
       </div>
       <br>
 
+      <!-- Q22 -->
+      <div class="auth-form-group">
+        <label for="q22">22. Did the Home Page clearly communicate the purpose of the platform?</label>
+        <select id="q22" name="ui_homepage_clarity" class="feedback-select">
+           <option value="yes">Yes, very clear</option>
+           <option value="somewhat">Somewhat</option>
+           <option value="no">No, it was unclear</option>
+        </select>
+      </div>
+      <br>
+
    <!-- last -->
     <div class="auth-form-group">
-        <label for="satisfaction">22. How would you rate your experience with RiseFaze so far?</label>
+        <label for="satisfaction">23. How would you rate your experience with RiseFaze so far?</label>
         <select id="satisfaction" name="satisfaction" class="feedback-select" required>
           <option value="" disabled selected>Select a rating</option>
           <option value="5">⭐⭐⭐⭐⭐ (Excellent)</option>

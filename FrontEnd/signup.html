@@ -35,15 +35,15 @@
     <div class="auth-container">
       <!-- Form Card -->
       <div class="feature-card auth-form-card">
-        <form id="signupForm" novalidate>
+        <form id="signupForm">
           <div class="auth-form-group">
             <label for="email">Email</label>
-            <input id="email" name="email" type="email" required placeholder="you@example.com" />
+            <input id="email" name="email" type="email" required placeholder="you@example.com" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}" title="Please enter a valid email address" />
           </div>
           
           <div class="auth-form-group">
             <label for="username">Username</label>
-            <input id="username" name="username" type="text" required placeholder="Choose a username" />
+            <input id="username" name="username" type="text" required placeholder="Set a username" />
           </div>
 
           <div class="auth-form-row">
