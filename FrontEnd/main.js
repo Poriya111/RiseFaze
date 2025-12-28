@@ -1,7 +1,6 @@
 // Run this function when the DOM is fully loaded
 document.addEventListener('DOMContentLoaded', () => {
-  // --- Global UI setup based on login state ---
-  let currentUser = null; // Store the current user globally for socket updates
+  // --- Global UI setup based on login state --  let currentUser = null; // Store the current user globally for socket updates
 
   const checkLoginState = () => {
     const isLoggedIn = localStorage.getItem('authToken');
@@ -28,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dashboardBtn.href = 'dashboard.html';
         dashboardBtn.className = 'btn primary-btn';
         dashboardBtn.id = 'dashboardNavBtn';
-        dashboardBtn.textContent = 'Go to Dashboard';
+        dashboardBtn.textContent = 'Dashboard';
         nav.appendChild(dashboardBtn);
       }
     }
@@ -127,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (seeDemoBtn) {
     seeDemoBtn.addEventListener('click', () => {
       // navigate to demo page if you add one, otherwise keep placeholder
-      alert("Demo of RiseFaze core loop!");
+      alert("Welcome to the RiseFaze platform demonstration.");
     });
   }
 
@@ -177,11 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const confirm = this.confirm.value;
 
       if (!name || !email || !pw || !confirm) {
-        alert('Please complete all required fields.');
+        alert('Please complete all required fields to proceed.');
         return;
       }
       if (pw !== confirm) {
-        alert('Passwords do not match.');
+        alert('The passwords provided do not match.');
         return;
       }
 
@@ -197,13 +196,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || 'Something went wrong');
+          throw new Error(data.message || 'An unexpected error occurred.');
         }
 
         localStorage.setItem('authToken', data.token);
         window.location.href = 'dashboard.html';
       } catch (error) {
-        alert(`Signup failed: ${error.message}`);
+        alert(`Registration failed: ${error.message}`);
       }
     });
   }
@@ -216,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = this.email.value.trim();
       const pw = this.password.value;
       if (!email || !pw) {
-        alert('Please fill all required fields.');
+        alert('Please enter your email and password.');
         return;
       }
 
@@ -232,14 +231,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || 'Something went wrong');
+          throw new Error(data.message || 'An unexpected error occurred.');
         }
 
         // Store the token and redirect
         localStorage.setItem('authToken', data.token);
         window.location.href = 'dashboard.html';
       } catch (error) {
-        alert(`Login failed: ${error.message}`);
+        alert(`Authentication failed: ${error.message}`);
       }
     });
   }
@@ -252,10 +251,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const email = this.email.value.trim();
       const message = this.message.value.trim();
       if (!name || !email || !message) {
-        alert('Please fill out all fields.');
+        alert('Please complete all fields.');
         return;
       }
-      alert('Thank you for your message! We will get back to you shortly.');
+      alert('Thank you. Your message has been sent to our support team.');
       this.reset(); // Clear the form
     });
   }
@@ -266,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
     generalFeedbackForm.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      let bodyText = "General User Feedback Submission:\n\n";
+      let bodyText = "RiseFaze User Feedback Submission:\n\n";
       const formData = new FormData(generalFeedbackForm);
 
       // Iterate through form entries to build the email body
@@ -298,7 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const updateMailLink = (username) => {
       const currentHref = emailSupportBtn.getAttribute('href');
       // Base body text
-      let body = "Hello RiseFaze Support,\n\n";
+      let body = "Dear RiseFaze Support Team,\n\n";
       
       if (username) {
         body += `\n\n\nUsername: ${username}`;
@@ -403,18 +402,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('authToken');
 
         if (!assetId || !token) {
-          alert('Could not process sale. Please try again.');
+          alert('Unable to process transaction. Please try again.');
           return;
         }
 
         if (isNaN(customPrice) || customPrice <= 0) {
-          alert('Please enter a valid selling price.');
+          alert('Please enter a valid amount.');
           return;
         }
 
         // Frontend validation for the 5% margin
         if (customPrice > maxSellPrice) {
-          alert(`Price too high. The maximum selling price for this asset is RFC ${maxSellPrice.toLocaleString()}.`);
+          alert(`Price exceeds limit. The maximum selling price is RFC ${maxSellPrice.toLocaleString()}.`);
           return;
         }
 
@@ -443,12 +442,12 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           // --- FIX: Optimistically update UI since the backend logic succeeds before crashing ---
-          showNotification('Asset sold successfully!', 'success');
+          showNotification('Asset sold successfully.', 'success');
           assetModal.classList.remove('visible'); // Close the modal
           renderDashboardData(); // Re-fetch all dashboard data to ensure consistency
 
         } catch (error) {
-          showNotification(`Error: ${error.message}`, 'error');
+          showNotification(`Transaction Error: ${error.message}`, 'error');
         }
       });
     }
@@ -506,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const listContainer = document.getElementById('notificationsList');
       if (!listContainer) return;
 
-      listContainer.innerHTML = '<p class="loading-message">Loading notifications...</p>';
+      listContainer.innerHTML = '<p class="loading-message">Retrieving notifications...</p>';
       const token = localStorage.getItem('authToken');
 
       try {
@@ -514,13 +513,13 @@ document.addEventListener('DOMContentLoaded', () => {
           headers: { 'Authorization': `Bearer ${token}` },
         });
 
-        if (!response.ok) throw new Error('Failed to fetch notifications');
+        if (!response.ok) throw new Error('Unable to retrieve notifications');
 
         const notifications = await response.json();
         listContainer.innerHTML = ''; // Clear loading message
 
         if (notifications.length === 0) {
-          listContainer.innerHTML = '<p class="empty-state-message">No notifications in the last 24 hours.</p>';
+          listContainer.innerHTML = '<p class="empty-state-message">No recent notifications found.</p>';
           return;
         }
 
@@ -536,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       } catch (error) {
         console.error('Error fetching notifications:', error);
-        listContainer.innerHTML = '<p class="empty-state-message">Could not load notifications.</p>';
+        listContainer.innerHTML = '<p class="empty-state-message">Unable to load notifications.</p>';
       }
     });
   }
@@ -697,7 +696,7 @@ document.addEventListener('DOMContentLoaded', () => {
       loadingMessage.style.display = 'none'; // Hide loading message
 
       if (bankAssets.length === 0) {
-        assetsGrid.innerHTML = '<p class="empty-state-message">The RiseFaze Bank has no assets for sale at this time.</p>';
+        assetsGrid.innerHTML = '<p class="empty-state-message">The RiseFaze Marketplace currently has no assets listed.</p>';
         return;
       }
       
@@ -722,12 +721,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (isOnCooldown) {
-          buttonText = 'On Cooldown';
-          buttonTitle = 'You cannot repurchase an asset you sold within 6 hours.';
+          buttonText = 'Cooldown Active';
+          buttonTitle = 'Repurchase restricted within 6 hours of sale.';
           isDisabled = true;
         } else if (user && !canAfford) {
-          buttonText = "Insufficient RFC";
-          buttonTitle = 'You do not have enough RFC to purchase this.';
+          buttonText = "Insufficient Funds";
+          buttonTitle = 'Insufficient RFC balance for this purchase.';
           isDisabled = true;
         }
 
@@ -765,7 +764,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <h3>${asset.name}</h3>
             <p class="asset-price">RFC ${asset.price.toLocaleString()}</p>
           </div>
-          <p class="asset-source">Sold by RiseFaze Assets Bank</p>
+          <p class="asset-source">Listed by RiseFaze Marketplace</p>
           <p class="asset-description">${asset.description}</p>
           <button class="btn primary-btn purchase-btn" data-id="${asset._id}" ${isDisabled ? 'disabled' : ''} title="${buttonTitle}">
             ${buttonText}
@@ -786,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     } catch (error) {
-      loadingMessage.textContent = 'Failed to load assets. Please try again later.';
+      loadingMessage.textContent = 'Unable to load marketplace assets. Please try again later.';
       console.error('Failed to fetch marketplace assets:', error);
     }
   };
@@ -804,7 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
       loadingMessage.style.display = 'none'; // Hide loading message
 
       if (leaderboardData.length === 0) {
-        leaderboardList.innerHTML = '<p class="empty-state-message">Leaderboard data is currently unavailable.</p>';
+        leaderboardList.innerHTML = '<p class="empty-state-message">Rankings are currently unavailable.</p>';
         return;
       }
       
@@ -828,7 +827,7 @@ document.addEventListener('DOMContentLoaded', () => {
         leaderboardList.appendChild(item);
       });
     } catch (error) {
-      loadingMessage.textContent = 'Failed to load leaderboard.';
+      loadingMessage.textContent = 'Unable to retrieve leaderboard data.';
       console.error('Failed to fetch leaderboard:', error);
     }
   };
@@ -845,7 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if there are any .asset-card elements left.
     if (grid.children.length === 0) {
-      grid.innerHTML = '<p class="empty-state-message">You do not own any assets yet. Visit the explore page to start building your empire!</p>';
+      grid.innerHTML = '<p class="empty-state-message">You currently possess no assets. Visit the Marketplace to begin building your portfolio.</p>';
       // Optional: Make the explore button more prominent
       exploreBtn.style.marginTop = '20px';
     }
@@ -1030,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!emptyMessage) {
                 emptyMessage = document.createElement('p');
                 emptyMessage.className = 'empty-state-message empty-state-message-filter';
-                emptyMessage.textContent = 'No assets match your filters.';
+                emptyMessage.textContent = 'No assets found matching your criteria.';
                 assetsGrid.appendChild(emptyMessage);
             }
         } else if (emptyMessage) {
@@ -1055,7 +1054,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('authToken');
 
       if (!token) {
-        alert('You must be logged in to purchase assets.');
+        alert('Authentication required to purchase assets.');
         window.location.href = 'login.html';
         return;
       }
@@ -1068,7 +1067,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const currentBalance = parseFloat(currentBalanceText);
 
       if (currentBalance < assetPrice) {
-        showNotification("You don't have enough RFC to purchase this asset.", 'error');
+        showNotification("Insufficient funds to complete this purchase.", 'error');
         // Stop execution here; do not proceed to fetch or animate.
         return;
       }
@@ -1088,7 +1087,7 @@ document.addEventListener('DOMContentLoaded', () => {
         card.addEventListener('animationend', () => card.remove());
 
         // Show success notification optimistically as well
-        showNotification('Asset purchased!', 'success');
+        showNotification('Asset acquired successfully.', 'success');
 
         // --- FIX: Re-fetch user data and update UI optimistically ---
         // This ensures the leaderboard and balance display update even with the backend error.
@@ -1105,13 +1104,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (!response.ok) {
-          let errorMessage = 'An unknown error occurred during purchase.';
+          let errorMessage = 'An unexpected error occurred during the transaction.';
           try {
             // Try to parse the error response as JSON, as it might contain a specific message
             const errorData = await response.json();
             if (errorData.message) {
               errorMessage = errorData.message.includes('Insufficient rfcBalance')
-                ? "You don't have enough RFC to purchase this asset."
+                ? "Insufficient funds to complete this purchase."
                 : errorData.message;
             }
           } catch (e) {
@@ -1123,7 +1122,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       } catch (error) {
         // --- NEW: Show a notification specifically for insufficient funds ---
-        if (error.message.includes("You don't have enough RFC")) {
+        if (error.message.includes("Insufficient funds")) {
           showNotification(error.message, 'error');
         } else {
           // For other errors, log silently as previously requested.
@@ -1203,6 +1202,23 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
   };
+
+  // Mobile Menu Toggle Logic
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const nav = document.querySelector('header nav');
+
+  if (mobileMenuBtn && nav) {
+    mobileMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      nav.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!nav.contains(e.target) && e.target !== mobileMenuBtn) {
+        nav.classList.remove('active');
+      }
+    });
+  }
 
   initSocket();
 
