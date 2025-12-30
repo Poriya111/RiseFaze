@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5001/api/users/signup', {
+        const response = await fetch('/api/users/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const response = await fetch('http://localhost:5001/api/users/login', {
+        const response = await fetch('/api/users/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const token = localStorage.getItem('authToken');
     if (token) {
-      fetch('http://localhost:5001/api/users/me', {
+      fetch('/api/users/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.ok ? res.json() : null)
@@ -418,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-          const response = await fetch(`http://localhost:5001/api/assets/${assetId}/sell`, {
+          const response = await fetch(`/api/assets/${assetId}/sell`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json', // Tell the server we're sending JSON
@@ -509,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const token = localStorage.getItem('authToken');
 
       try {
-        const response = await fetch('http://localhost:5001/api/users/notifications', {
+        const response = await fetch('/api/users/notifications', {
           headers: { 'Authorization': `Bearer ${token}` },
         });
 
@@ -632,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!token) return;
 
       try {
-        const response = await fetch(`http://localhost:5001/api/users/performance?timeframe=${currentTimeframe}`, {
+        const response = await fetch(`/api/users/performance?timeframe=${currentTimeframe}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (!response.ok) throw new Error('Failed to fetch performance data');
@@ -690,7 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!assetsGrid || !loadingMessage) return;
 
     try {
-      const response = await fetch('http://localhost:5001/api/assets/explore');
+      const response = await fetch('/api/assets/explore');
       const bankAssets = await response.json();
 
       loadingMessage.style.display = 'none'; // Hide loading message
@@ -797,7 +797,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!leaderboardList || !loadingMessage) return;
 
     try {
-      const response = await fetch('http://localhost:5001/api/leaderboard');
+      const response = await fetch('/api/leaderboard');
       const leaderboardData = await response.json();
 
       loadingMessage.style.display = 'none'; // Hide loading message
@@ -860,7 +860,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5001/api/users/me', {
+      const response = await fetch('/api/users/me', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -948,7 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (token) {
         try {
-          const userResponse = await fetch('http://localhost:5001/api/users/me', {
+          const userResponse = await fetch('/api/users/me', {
             headers: { 'Authorization': `Bearer ${token}` },
           });
           if (userResponse.ok) {
@@ -1073,7 +1073,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       try {
-        const response = await fetch(`http://localhost:5001/api/assets/${assetId}/buy`, {
+        const response = await fetch(`/api/assets/${assetId}/buy`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`
@@ -1091,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- FIX: Re-fetch user data and update UI optimistically ---
         // This ensures the leaderboard and balance display update even with the backend error.
-        const userResponse = await fetch('http://localhost:5001/api/users/me', { headers: { 'Authorization': `Bearer ${token}` } });
+        const userResponse = await fetch('/api/users/me', { headers: { 'Authorization': `Bearer ${token}` } });
         if (userResponse.ok) {
           const updatedUser = await userResponse.json();
           renderLeaderboard(updatedUser);
@@ -1137,7 +1137,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Socket.io Real-time Notifications ---
     const token = localStorage.getItem('authToken');
     if (token) {
-      const socket = io('http://localhost:5001');
+      const socket = io();
 
       socket.on('connect', () => {
         console.log('Connected to server via WebSocket.');

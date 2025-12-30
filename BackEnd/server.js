@@ -4,6 +4,7 @@ dotenv.config();
 const express = require('express');
 const http = require('http'); // Required for socket.io
 const { Server } = require('socket.io'); // Import the Server class
+const path = require('path');
 const jwt = require('jsonwebtoken'); // To verify tokens for socket auth
 const connectDB = require('./db.js'); // Corrected path
 const { startEconomyEngine } = require('./utils/economyEngine.js');
@@ -62,6 +63,9 @@ app.use(express.json());
 
 // Enable CORS for all routes (important for frontend-backend communication during development)
 app.use(cors());
+
+// Serve static files from the FrontEnd folder
+app.use(express.static(path.join(__dirname, '../FrontEnd')));
 
 // Define a basic test route
 app.get('/api', (req, res) => {
