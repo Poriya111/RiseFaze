@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="media/favicon.png"/>
+  <title>RiseFaze — Information Document</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-mode">
+
+<!-- Header -->
+<header class="header">
+  <a href="index.html" class="logo">
+    <img src="media/logo.png" alt="RiseFaze logo" class="logo-img">
+    RiseFaze
+  </a>  <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+
+  <nav>
+    <a href="index.html#features" class="nav-link">Features</a>
+    <a href="explore.html" class="nav-link">Explore</a>
+    <a href="help.html" class="nav-link">Help</a>
+    <button class="btn mode-toggle" id="modeToggle">🌙</button>
+    <a href="login.html" class="btn login-btn">Login</a>
+    <a href="signup.html" class="btn primary-btn">Sign Up</a>
+  </nav>
+</header>
+<br><br><br>
+
+<!-- Main Content -->
+<main class="static-page-container lazy-load">
+  <div class="feature-card" style="width: 90%; max-width: 1000px; margin: 0 auto;">
+    <h1 style="text-align: center; margin-bottom: 1rem;">RiseFaze Information Document</h1>
+    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 2rem;">Everything you need to know about building your digital empire.</p>
+    
+    <h3>1. Introduction</h3>
+    <p>Welcome to RiseFaze. I created this platform to provide a realistic, risk-free environment where you can practice business strategies, understand asset management, and compete with others globally. This document outlines the core mechanics and logic behind the simulation.</p>
+
+    <h3>2. The Economy: RFC</h3>
+    <p><strong>RFC (RiseFaze Currency)</strong> is the exclusive currency of this platform. It is used for all transactions, including buying assets and receiving revenue.</p>
+    <ul>
+        <li><strong>Starting Capital:</strong> Every new account receives a grant of RFC to begin their journey.</li>
+        <li><strong>Generating Revenue:</strong> The primary way to earn RFC is by owning assets. Different assets have different yield rates.</li>
+    </ul>
+
+    <h3>3. Assets & Net Worth</h3>
+    <p>Your <strong>Net Worth</strong> is the ultimate score in RiseFaze. It is calculated as:</p>
+    <blockquote style="background: var(--bg-secondary); padding: 1rem; border-left: 4px solid var(--primary-color); margin: 1rem 0;">
+        <strong>Net Worth = (Current RFC Balance) + (Total Value of Owned Assets)</strong>
+    </blockquote>
+    <p>Assets are virtual items (like Real Estate, Stocks, or Commodities) that you can purchase from the Marketplace. Once owned, they contribute to your Net Worth and may generate passive income over time.</p>
+
+    <h3>4. How to Play: A Step-by-Step Guide</h3>
+    
+    <h4>Step 1: Dashboard Overview</h4>
+    <p>After logging in, you are taken to your <strong>Dashboard</strong>. This is your headquarters. Here, you can monitor your financial KPIs (Key Performance Indicators) and see a graphical representation of your empire's growth.</p>
+
+    <h4>Step 2: Exploring the Market</h4>
+    <p>Navigate to the <strong>Explore</strong> page. This is the global marketplace where the "RiseFaze Bank" lists available assets. You can filter, search, and analyze different investment opportunities.</p>
+
+    <h4>Step 3: Making an Investment</h4>
+    <p>When you find an asset you like, click on it to view details. If you have sufficient RFC, you can purchase it. The asset will immediately transfer to your portfolio.</p>
+
+    <h4>Step 4: Climbing the Leaderboard</h4>
+    <p>As your Net Worth grows, check the <strong>Global Leaderboard</strong> on the Explore page. This real-time list ranks all players based on their financial success. Your goal is to reach the top.</p>
+
+    <h3>5. Selling Assets</h3>
+    <p>You can sell your assets back to the market. To ensure fair play and economic stability, the following rules apply:</p>
+    <ul>
+        <li><strong>Profit Margin:</strong> You can set a sell price with a maximum margin of <strong>5%</strong>.</li>
+        <li><strong>Bank Markup:</strong> The bank adds a <strong>2%</strong> fee to the asset's price when listing it for sale again.</li>
+        <li><strong>Cooldown:</strong> After selling an asset, you cannot repurchase the same asset for <strong>6 hours</strong>.</li>
+    </ul>
+
+    <h3>6. Technical & Account Information</h3>
+    <ul>
+        <li><strong>Solo Development:</strong> RiseFaze is built and maintained by me, a solo developer. I am constantly working on updates and improvements.</li>
+        <li><strong>Privacy:</strong> I respect your data. Your password is hashed, and I do not track you with third-party cookies. See the <a href="privacy.html" style="color: #4492eb; text-decoration: none;">Privacy Policy</a> for more details.</li>
+        <li><strong>Support:</strong> If you encounter a bug or have a suggestion, please use the Feedback button or the contact form in the Help section.</li>
+    </ul>
+
+    <hr style="margin: 2rem 0; border: 0; border-top: 1px solid var(--border-color);">
+    
+    <p style="text-align: center;"><em>Ready to start? <a href="explore.html" style="color: #4492eb; text-decoration: none;">Go to the Marketplace</a> and make your first move.</em></p>
+  </div>
+</main>
+<br><br><br>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <p>&copy; 2025 RiseFaze. All rights reserved. <strong>Version 1.0</strong></p>
+    <div class="footer-links">
+      <a href="terms.html">Terms</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Floating Feedback Button -->
+<button class="feedback-btn" id="feedbackBtn" title="Send Feedback">Feedback</button>
+
+<script src="main.js"></script>
+</body>
+</html>
