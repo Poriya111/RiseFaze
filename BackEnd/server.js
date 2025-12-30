@@ -67,6 +67,11 @@ app.use(cors());
 // Serve static files from the FrontEnd folder
 app.use(express.static(path.join(__dirname, '../FrontEnd')));
 
+// Explicitly serve index.html for the root URL
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../FrontEnd/index.html'));
+});
+
 // Define a basic test route
 app.get('/api', (req, res) => {
   res.send('RiseFaze Backend API is running...');
