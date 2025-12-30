@@ -1675,6 +1675,7 @@ footer a:hover::after {
 /* Performance Graph Styles */
 .performance-graph-container {
   width: 100%;
+  max-width: none;
   box-sizing: border-box;
   margin-top: 40px;
   max-height: 800px; 
@@ -2043,7 +2044,7 @@ body.dark-mode .chart-toggle-btn.active, body.dark-mode .time-toggle-btn.active 
   
   /* Ensure charts don't break layout */
   .chart-container {
-    height: 250px !important;
+    height: 300px !important;
   }
 
   /* Adjust modal padding */
@@ -2053,11 +2054,7 @@ body.dark-mode .chart-toggle-btn.active, body.dark-mode .time-toggle-btn.active 
   }
 }
 
-@media (min-width: 480px) and (max-width: 768px) {
-  .kpi-grid {
-    /* Flex layout handles spacing automatically */
-  }
-}
+
 
 @media (max-width: 500px) {
   .mode-toggle:hover {
@@ -2192,5 +2189,8 @@ body.dark-mode .chart-toggle-btn.active, body.dark-mode .time-toggle-btn.active 
   .chart-toggle-btn, .time-toggle-btn {
     padding: 6px 10px;
     font-size: 12px;
+  }
+  .owned-assets-container {
+    width: 90%;
   }
 }
